@@ -14,6 +14,9 @@
                                     v-model="user.username" :error-messages="usernameErrors"></v-text-field>
                                 <v-text-field prepend-icon="lock" name="password" label="Password" type="password"
                                     v-model="user.password" :error-messages="passwordErrors"></v-text-field>
+                                <router-link to="/PasswordReset" class="text-xs-right white--text" style="float: right;">Forgot
+                                    Password?</router-link>
+                                <v-checkbox v-model="rememberme" label="Remember Login?"></v-checkbox>
                             </v-form>
                         </v-card-text>
                         <v-card-actions>
@@ -26,6 +29,19 @@
                     {{ snackText }}
                     <v-btn flat @click="snack = false">Close</v-btn>
                 </v-snackbar>
+            </v-layout>
+        </v-container>
+        <v-container fluid fill-height>
+            <v-layout>
+                <v-flex xs12 sm8 md4 offset-sm2 offset-md4>
+                    <v-card>
+                        <v-card-title class="justify-center">
+                            <h3 class="text-xs-center">Need an account? <router-link to="/register" class="white--text">Register
+                                    Here</router-link>
+                            </h3>
+                        </v-card-title>
+                    </v-card>
+                </v-flex>
             </v-layout>
         </v-container>
     </div>
@@ -49,6 +65,7 @@
                     username: '',
                     password: ''
                 },
+                rememberme: false,
                 snack: false,
                 snackColor: '',
                 snackText: '',
@@ -70,7 +87,16 @@
                             this.snackColor = response.data.type;
                             this.snackText = response.data.message;
                         } else {
-                            this.ADD_USER(response.data);
+                            if (this.rememberme) {
+                                var today = new Date();
+                                var expire = new Date();
+                                expire.setTime(today.getTime() + 3600000 * 24 * 7);
+                                document.cookie = "token=" + escape(response.data.token) + ";expires=" +
+                                    expire.toGMTString();
+                            }
+                            this.ADD_USER({
+                                username: response.data.username
+                            });
                             this.$router.push('/')
                         }
                     })

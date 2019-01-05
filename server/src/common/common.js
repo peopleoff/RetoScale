@@ -1,5 +1,7 @@
 let nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+const jwtSecret = require('../config/config').authentication.jwtSecret;
 
 const ENCRYPTION_KEY = "DwNfv0unVZPZu9hepdMpbBgwXTZAMf5R"; // Must be 256 bytes (32 characters)
 const IV_LENGTH = 16; // For AES, this is always 16
@@ -92,5 +94,9 @@ function getDate() {
     return new Date().toISOString().slice(0, 19).replace('T', ' ');
 }
 
+function errorHandler(error){
+    throw new Error(error);
+}
 
-module.exports = { decrypt, encrypt, checkNull, doesMatch, sendEmail, generatePassword, getDate };
+
+module.exports = { decrypt, encrypt, checkNull, doesMatch, sendEmail, generatePassword, getDate, errorHandler };

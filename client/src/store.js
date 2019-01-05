@@ -15,7 +15,6 @@ const vuexLocalStorage = new VuexPersist({
 })
 
 export default new Vuex.Store({
-  plugins: [vuexLocalStorage.plugin],
   state: {
     user: null
   },
@@ -28,6 +27,7 @@ export default new Vuex.Store({
     },
     SIGN_OUT: (state) => {
       state.user = null;
+      document.cookie = `token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
       router.push('/');
     },
 

@@ -4,6 +4,9 @@ const ItemControllerPolicy = require('./policies/ItemControllerPolicy');
 const User = require('./controllers/UserController');
 const Item = require('./controllers/ItemController');
 
+//JWT middleware
+const {isAuthenticated} = require('./config/auth');
+
 module.exports = (app) => {
 
     // Get Requests
@@ -17,7 +20,7 @@ module.exports = (app) => {
     app.post('/updateUserStatus', User.updateUserStatus);
     app.post('/deleteItem', Item.deleteItem);
     app.post('/signIn', User.signIn);
-    app.post('/getUser', User.getUser);
+    app.post('/getUser', isAuthenticated, User.getUser);
     app.post('/updateUser', User.updateUser);
 
 };

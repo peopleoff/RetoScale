@@ -6,7 +6,20 @@ const {
 } = require('../models');
 const bcrypt = require('bcryptjs');
 const salt = '$2a$10$Q/AH0MPPKyMVNzshASojgO';
+const jwt = require('jsonwebtoken');
 const registerKey = "RetroFunTimes"
+const ONE_WEEK = 60 * 60 * 24 * 7;
+const ONE_SECOND = 60;
+
+const {
+    errorHandler
+} = require('../common/common');
+
+//jwt config
+const jwtSecret = require('../config/config').authentication.jwtSecret;
+const {
+    signUser
+} = require('../config/auth');
 
 users.belongsTo(status_types, {
     foreignKey: 'status_id'
@@ -36,33 +49,48 @@ module.exports = {
             })
         }
         users.findOne({
-            where: {
-                username: req.body.username
-            }
-        }).then(project => {
-            if (project) {
-                return res.send({
-                    error: true,
-                    message: "User already exsists",
-                    type: "error"
-                })
-            } else {
-                req.body.password = bcrypt.hashSync(req.body.password, salt);
-                req.body.status = 3;
-                users.create(req.body).then(response => {
+                where: {
+                    username: req.body.username
+                }
+            }).then(project => {
+                if (project) {
                     return res.send({
-                        error: false,
-                        message: "Thank you for registering, Please wait for your account to be approved.",
-                        type: "success"
+                        error: true,
+                        message: "User already exsists",
+                        type: "error"
                     })
-                });
-            }
-        })
-        .catch(err =>{
-            console.log(err);
-        });
+                } else {
+                    req.body.password = bcrypt.hashSync(req.body.password, salt);
+                    req.body.status = 3;
+                    users.create(req.body).then(response => {
+                        return res.send({
+                            error: false,
+                            message: "Thank you for registering, Please wait for your account to be approved.",
+                            type: "success"
+                        })
+                    });
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
     },
     signIn(req, res) {
+        if (req.body.token) {
+            try {
+                decoded = jwt.verify(req.body.token, jwtSecret).user;
+                return res.send({
+                    token: req.body.token,
+                    username: decoded.username
+                })
+            } catch (err) {
+                return res.send({
+                    error: true,
+                    type: 'error',
+                    message: err
+                })
+            }
+        }
         if (!req.body) {
             return res.send({
                 error: true,
@@ -71,29 +99,34 @@ module.exports = {
             })
         }
         users.findOne({
-            where: {
-                username: req.body.username
-            }
-        }).then(project => {
-            if (!project) {
-                return res.send({
-                    error: true,
-                    message: "Username or Password is incorrect",
-                    type: "error"
-                })
-            } else {
-                if (bcrypt.compareSync(req.body.password, project.password) && project.status_id == 2) {
-                    project.password = null;
-                    return res.status(200).send(project);
-                } else {
+                where: {
+                    username: req.body.username
+                }
+            })
+            .then(user => {
+                if (!user) {
                     return res.send({
                         error: true,
-                        message: 'Username or Password incorrect',
+                        message: "Username or Password is incorrect",
                         type: "error"
-                    });
+                    })
+                } else {
+                    if (bcrypt.compareSync(req.body.password, user.password) && user.status_id == 2) {
+                        delete user.password
+                        let token = signUser(user);
+                        res.send({
+                            token: token,
+                            username: user.username
+                        });
+                    } else {
+                        return res.send({
+                            error: true,
+                            message: 'Username or Password incorrect',
+                            type: "error"
+                        });
+                    }
                 }
-            }
-        });
+            });
     },
     async updateUserStatus(req, res) {
         try {
@@ -123,7 +156,7 @@ module.exports = {
                     message: "Passwords do not match",
                     type: "error"
                 })
-            }else{
+            } else {
                 req.body.password = bcrypt.hashSync(req.body.password, salt);
             }
         }
@@ -168,10 +201,10 @@ module.exports = {
         try {
             users.findOne({
                 where: {
-                    id: req.body.id
+                    id: id
                 },
                 attributes: ['id', 'firstname', 'lastname', 'username', 'email']
-            }).then(user => {
+            }).lean().then(user => {
                 // project will be the first entry of the Projects table with the title 'aProject' || null
                 // project.title will contain the name of the project
                 res.send(user);

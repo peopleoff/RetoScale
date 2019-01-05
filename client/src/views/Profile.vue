@@ -66,7 +66,7 @@
         },
         mounted() {
             this.getUser({
-                id: this.$store.state.user.id
+                token: this.$store.state.user.token
             });
         },
         methods: {

@@ -7,15 +7,29 @@ import Register from './views/Register.vue'
 import Users from './views/Users.vue'
 import Profile from './views/Profile.vue'
 import Privacy from './views/Privacy.vue'
+import PasswordReset from './views/PasswordReset.vue'
 import PageNotFound from './views/PageNotFound.vue'
+
+
+//Import Store
+import store from './store';
+
+
+//Import UserService to login user from router
+import UserService from '@/services/UserService'
 
 Vue.use(Router)
 
-export default new Router({
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
+}
+
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes: [
-    {
+  routes: [{
       path: '/',
       name: 'home',
       component: Home
@@ -23,7 +37,18 @@ export default new Router({
     {
       path: '/Login',
       name: 'Login',
-      component: Login
+      component: Login,
+      beforeEnter: (to, from, next) => {
+        console.log(!store.state.user);
+        if (!store.state.user) {
+          next();
+        }else{
+          next({
+            path: '/',
+            name: 'home'
+          });
+        }
+      }
     },
     {
       path: '/Register',
@@ -50,6 +75,11 @@ export default new Router({
       name: 'Privacy',
       component: Privacy
     },
+    {
+      path: '/PasswordReset',
+      name: 'PasswordReset',
+      component: PasswordReset
+    },
 
 
     //404 page
@@ -60,3 +90,28 @@ export default new Router({
     },
   ]
 })
+
+
+router.beforeEach((to, from, next) => {
+  function isLoggedIn(){
+    let token = getCookie('token');
+    let user =store.state.user
+    if(!user && token){
+      store.commit('ADD_USER', {user: 'asdasd'})
+      UserService.signIn({
+        token: token
+      }).then(response => {
+        if (response.data.error) {
+          store.commit('SIGN_OUT')
+        } else {
+          store.commit('ADD_USER', {username: response.data.username})
+        }
+    })
+    }
+  }
+  isLoggedIn();
+  next();
+});
+
+
+export default router

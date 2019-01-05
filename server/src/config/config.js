@@ -1,12 +1,14 @@
+require('dotenv').config()
+
 module.exports = {
     port: 8081,
     db: {
-        database: 'retoscale',
-        user: 'rbelyy',
-        password: 'Ruslan5440!',
+        database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASS,
         options: {
             dialect: 'mysql',
-            host: 'ruslanbelyy.me',
+            host: process.env.DB_HOST,
             operatorsAliases: false,
             logging: console.log
         }
