@@ -9,8 +9,7 @@ module.exports = {
         options: {
             dialect: 'mysql',
             host: process.env.DB_HOST,
-            operatorsAliases: false,
-            logging: console.log
+            operatorsAliases: false
         }
     },
     authentication: {

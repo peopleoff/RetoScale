@@ -1,43 +1,54 @@
 <template>
     <div id="app">
-                <v-container fluid fill-height>
-                    <v-layout align-center justify-center>
-                        <v-flex xs12 sm8 md4>
-                            <v-card class="elevation-12 mt-5">
-                                <v-toolbar dark>
-                                    <v-toolbar-title>Register Form</v-toolbar-title>
-                                    <v-spacer></v-spacer>
-                                </v-toolbar>
-                                <v-card-text>
-                                    <v-form>
-                                        <v-text-field prepend-icon="person" name="firstname" label="First Name" type="text"
-                                            v-model.trim.lazy="$v.user.firstname.$model" :error-messages="firstnameErrors"></v-text-field>
-                                        <v-text-field prepend-icon="person" name="lastname" label="Last Name" type="text"
-                                            v-model.trim.lazy="$v.user.lastname.$model" :error-messages="lastnameErrors"></v-text-field>
-                                        <v-text-field prepend-icon="person" name="username" label="Username" type="text"
-                                            v-model="user.username" :error-messages="usernameErrors"></v-text-field>
-                                        <v-text-field prepend-icon="lock" name="password" label="Password" type="password"
-                                            v-model="user.password" :error-messages="passwordErrors"></v-text-field>
-                                        <v-text-field prepend-icon="lock" name="confirmPassword" label="Confirm Password"
-                                            type="password" v-model="user.confirmPassword" :error-messages="confirmPasswordErrors"></v-text-field>
-                                        <v-text-field prepend-icon="email" name="email" label="Email" type="email"
-                                            v-model="user.email" :error-messages="emailErrors"></v-text-field>
-                                        <v-text-field prepend-icon="lock" name="key" label="Register Key" type="text"
-                                            v-model="user.registerKey" :error-messages="registerKeyErrors"></v-text-field>
-                                    </v-form>
-                                </v-card-text>
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn color="primary" @click="Register" v-on:keyup.enter="register()" :disabled=$v.$invalid>Register</v-btn>
-                                </v-card-actions>
-                            </v-card>
-                            <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
-                                {{ snackText }}
-                                <v-btn flat @click="snack = false">Close</v-btn>
-                            </v-snackbar>
-                        </v-flex>
-                    </v-layout>
-                </v-container>
+        <v-container fluid fill-height>
+            <v-layout align-center justify-center>
+                <v-flex xs12 sm8 md4>
+                    <v-card class="elevation-12 mt-5">
+                        <v-toolbar color="primary">
+                            <v-toolbar-title>Register Form</v-toolbar-title>
+                            <v-spacer></v-spacer>
+                        </v-toolbar>
+                        <v-card-text>
+                            <v-form>
+                                <v-text-field prepend-icon="person" name="firstname" label="First Name" type="text"
+                                    v-model.trim.lazy="$v.user.firstname.$model" :error-messages="firstnameErrors"></v-text-field>
+                                <v-text-field prepend-icon="person" name="lastname" label="Last Name" type="text"
+                                    v-model.trim.lazy="$v.user.lastname.$model" :error-messages="lastnameErrors"></v-text-field>
+                                <v-text-field prepend-icon="person" name="username" label="Username" type="text"
+                                    v-model="user.username" :error-messages="usernameErrors"></v-text-field>
+                                <v-text-field prepend-icon="lock" name="password" label="Password" type="password"
+                                    v-model="user.password" :error-messages="passwordErrors"></v-text-field>
+                                <v-text-field prepend-icon="lock" name="confirmPassword" label="Confirm Password" type="password"
+                                    v-model="user.confirmPassword" :error-messages="confirmPasswordErrors"></v-text-field>
+                                <v-text-field prepend-icon="email" name="email" label="Email" type="email" v-model="user.email"
+                                    :error-messages="emailErrors"></v-text-field>
+                                <v-text-field prepend-icon="lock" name="key" label="Register Key" type="text" v-model="user.registerKey"
+                                    :error-messages="registerKeyErrors"></v-text-field>
+                            </v-form>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="primaryAction"  @click="Register" v-on:keyup.enter="register()" :disabled=$v.$invalid>Register</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                    <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
+                        {{ snackText }}
+                        <v-btn flat @click="snack = false">Close</v-btn>
+                    </v-snackbar>
+                </v-flex>
+            </v-layout>
+        </v-container>
+        <v-container fluid fill-height>
+            <v-layout>
+                <v-flex xs12 sm8 md4 offset-sm2 offset-md4>
+                    <v-card>
+                        <v-card-title class="justify-center">
+                            <h3>Accounts are only for approved persons and require a Registration Key</h3>
+                        </v-card-title>
+                    </v-card>
+                </v-flex>
+            </v-layout>
+        </v-container>
     </div>
 </template>
 
@@ -220,7 +231,5 @@
 </script>
 
 <style scoped>
-    #inspire .application--wrap {
-        min-height: 90vh;
-    }
+
 </style>

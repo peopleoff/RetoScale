@@ -1,39 +1,54 @@
 const {
     items
 } = require('../models');
+const {
+    synergies
+} = require('../models');
+const {
+    sendLog
+} = require('../config/logging');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 module.exports = {
     async addItem(req, res) {
+        let item = req.body.item;
+        if (item.tier == 'None' || !item.tier) {
+            item.tier = null
+        }
         try {
-            await items.create(req.body);
+            await items.create(item);
             res.status(200).send({
                 error: false,
                 type: 'success',
                 message: "Item Added"
             })
         } catch (err) {
-            res.status(400).send({
-                error: false,
+            sendLog('error', err)
+            return res.send({
+                error: true,
                 type: 'error',
                 message: err
             })
         }
     },
     async updateItem(req, res) {
-        if(req.body.tier == 'None'){
-            req.body.tier = null
+        let item = req.body.item;
+        if (item.tier == 'None' || !item.tier) {
+            item.tier = null
         }
         try {
             await items.update({
-                name: req.body.name,
-                image: req.body.image,
-                description: req.body.description,
-                tier: req.body.tier,
-                scale: req.body.scale,
-                notes: req.body.notes,
+                name: item.name,
+                image: item.image,
+                description: item.description,
+                tier: item.tier,
+                type: item.type,
+                scale: item.scale,
+                notes: item.notes,
             }, {
                 where: {
-                    id: req.body.id
+                    id: item.id
                 }
             })
             res.status(200).send({
@@ -42,7 +57,9 @@ module.exports = {
                 message: "Item Updated"
             })
         } catch (err) {
-            res.status(400).send({
+            sendLog('error', err)
+            return res.send({
+                error: true,
                 type: 'error',
                 message: err
             })
@@ -53,8 +70,9 @@ module.exports = {
             const allitems = await items.findAll();
             res.send(allitems);
         } catch (err) {
-            res.status(400).send({
-                error: false,
+            sendLog('error', err)
+            return res.send({
+                error: true,
                 type: 'error',
                 message: err
             })
@@ -63,15 +81,18 @@ module.exports = {
     async getLastUpdated(req, res) {
         try {
             items.findOne({
-                order: [['updatedAt', 'DESC']],
-                attributes: ['updatedAt',]
+                order: [
+                    ['updatedAt', 'DESC']
+                ],
+                attributes: ['updatedAt', ]
             }).then(timeStamp => {
                 // project will be the first entry of the Projects table with the title 'aProject' || null
                 // project.title will contain the name of the project
                 res.send(timeStamp);
             })
         } catch (err) {
-            res.status(201).send({
+            sendLog('error', err)
+            return res.send({
                 error: true,
                 type: 'error',
                 message: err
@@ -79,10 +100,11 @@ module.exports = {
         }
     },
     deleteItem(req, res) {
+        let item = req.body.item;
         try {
             items.destroy({
                 where: {
-                    id: req.body.id
+                    id: item.id
                 }
             }).then(function (result) {
                 res.status(200).send({
@@ -92,7 +114,8 @@ module.exports = {
                 })
             });
         } catch (err) {
-            res.status(201).send({
+            sendLog('error', err)
+            return res.send({
                 error: true,
                 type: 'error',
                 message: err

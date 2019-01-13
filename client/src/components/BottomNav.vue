@@ -2,17 +2,20 @@
     <v-footer dark height="auto">
         <v-card class="flex" flat tile>
             <v-card-title class="pa-1">
-                <v-btn color="white" flat>
-                    <router-link to="/" class="links">Home</router-link>
-                </v-btn>
+                <router-link to="/" class="links">
+                    <v-btn color="white" flat>
+                        <!-- <router-link to="/" class="links">Home</router-link> -->
+                        Home
+                    </v-btn>
+                </router-link>
                 <v-btn color="white" flat v-if="!this.$store.state.user">
                     <router-link to="/login" class="links">Login</router-link>
                 </v-btn>
-                <v-btn color="white" flat>
+                <!-- <v-btn color="white" flat>
                     <router-link to="/privacy" class="links">Privacy</router-link>
-                </v-btn>
+                </v-btn> -->
                 <v-spacer></v-spacer>
-                <strong class="subheading">Last Updated on {{ lastUpdated }}</strong>
+                <strong class="subheading pa-3">Last Updated on {{ lastUpdated }}</strong>
             </v-card-title>
         </v-card>
     </v-footer>

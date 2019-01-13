@@ -4,7 +4,7 @@
             <v-layout align-center justify-center>
                 <v-flex xs12 sm8 md4>
                     <v-card class="elevation-12 mt-5">
-                        <v-toolbar dark>
+                        <v-toolbar color="primary">
                             <v-toolbar-title>Login form</v-toolbar-title>
                             <v-spacer></v-spacer>
                         </v-toolbar>
@@ -16,12 +16,12 @@
                                     v-model="user.password" :error-messages="passwordErrors"></v-text-field>
                                 <router-link to="/PasswordReset" class="text-xs-right white--text" style="float: right;">Forgot
                                     Password?</router-link>
-                                <v-checkbox v-model="rememberme" label="Remember Login?"></v-checkbox>
+                                <v-checkbox color="primaryAction" v-model="rememberme" label="Remember Login?"></v-checkbox>
                             </v-form>
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="primary" @click="signIn" :disabled=$v.$invalid>Login</v-btn>
+                            <v-btn color="primaryAction" @click="signIn" :disabled=$v.$invalid :loading="loading">Login</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-flex>
@@ -65,6 +65,7 @@
                     username: '',
                     password: ''
                 },
+                loading: false,
                 rememberme: false,
                 snack: false,
                 snackColor: '',
@@ -77,20 +78,28 @@
                 'ADD_USER'
             ]),
             signIn: function () {
-                this.$v.$touch()
+                this.$v.$touch();
+                this.loading = true;
                 if (this.$v.$invalid) {
                     return
                 } else {
                     UserService.signIn(this.user).then(response => {
+                         this.loading = false;
                         if (response.data.error) {
                             this.snack = true;
                             this.snackColor = response.data.type;
                             this.snackText = response.data.message;
                         } else {
+                            var today = new Date();
+                            var expire = new Date();
                             if (this.rememberme) {
-                                var today = new Date();
-                                var expire = new Date();
+                                //If remember me is checked, create cookie token cookie for a week
                                 expire.setTime(today.getTime() + 3600000 * 24 * 7);
+                                document.cookie = "token=" + escape(response.data.token) + ";expires=" +
+                                    expire.toGMTString();
+                            } else {
+                                //Otherwise set expiration for one hour
+                                expire.setTime(today.getTime() + 1 * 3600 * 1000);
                                 document.cookie = "token=" + escape(response.data.token) + ";expires=" +
                                     expire.toGMTString();
                             }
@@ -148,7 +157,5 @@
 </script>
 
 <style scoped>
-    #inspire .application--wrap {
-        min-height: 90vh;
-    }
+
 </style>

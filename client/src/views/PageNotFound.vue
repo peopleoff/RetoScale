@@ -21,8 +21,12 @@
             <p>Page not found</p>
             <div class="buttons-con">
                 <div class="action-link-wrap">
-                    <a onclick="history.back(-1)" class="link-button link-back-button">Go Back</a>
-                    <router-link to="/" class="link-button">Go to Home Page</router-link>
+                    <v-btn color="error" onclick="history.back(-1)">Go Back</v-btn>
+                    <router-link to="/">
+                    <v-btn color="primary">
+                        Home Page
+                    </v-btn>
+                    </router-link>
                 </div>
             </div>
         </div>
@@ -63,24 +67,6 @@
 
     .buttons-con .action-link-wrap {
         margin-top: 40px;
-    }
-
-    .buttons-con .action-link-wrap a {
-        background: #68c950;
-        padding: 8px 25px;
-        border-radius: 4px;
-        color: #FFF;
-        font-weight: bold;
-        font-size: 14px;
-        transition: all 0.3s linear;
-        cursor: pointer;
-        text-decoration: none;
-        margin-right: 10px
-    }
-
-    .buttons-con .action-link-wrap a:hover {
-        background: #5A5C6C;
-        color: #fff;
     }
 
     #Polygon-1,

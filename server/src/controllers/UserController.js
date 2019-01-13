@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const registerKey = "RetroFunTimes"
 const ONE_WEEK = 60 * 60 * 24 * 7;
 const ONE_SECOND = 60;
+const {sendLog} = require('../config/logging');
 
 const {
     errorHandler
@@ -18,7 +19,8 @@ const {
 //jwt config
 const jwtSecret = require('../config/config').authentication.jwtSecret;
 const {
-    signUser
+    signUser,
+    decodeToken
 } = require('../config/auth');
 
 users.belongsTo(status_types, {
@@ -72,7 +74,12 @@ module.exports = {
                 }
             })
             .catch(err => {
-                console.log(err);
+                sendLog('error', err)
+                return res.send({
+                    error: true,
+                    type: 'error',
+                    message: err
+                })
             });
     },
     signIn(req, res) {
@@ -84,6 +91,7 @@ module.exports = {
                     username: decoded.username
                 })
             } catch (err) {
+                sendLog('error', err)
                 return res.send({
                     error: true,
                     type: 'error',
@@ -129,12 +137,13 @@ module.exports = {
             });
     },
     async updateUserStatus(req, res) {
+        let user = req.body.user;
         try {
             await users.update({
-                status_id: req.body.status_id
+                status_id: user.status_id
             }, {
                 where: {
-                    id: req.body.id
+                    id: user.id
                 }
             })
             res.status(200).send({
@@ -142,44 +151,61 @@ module.exports = {
                 message: "User Updated"
             })
         } catch (err) {
-            res.status(201).send({
+            sendLog('error', err)
+            return res.send({
+                error: true,
                 type: 'error',
-                message: 'Error editing user'
+                message: err
             })
         }
     },
     async updateUser(req, res) {
-        if (req.body.password) {
-            if (req.body.password !== req.body.confirmPassword) {
+        let user = req.body.user;
+        if (user.password) {
+            if (user.password !== user.confirmPassword) {
                 return res.send({
                     error: true,
                     message: "Passwords do not match",
                     type: "error"
                 })
             } else {
-                req.body.password = bcrypt.hashSync(req.body.password, salt);
+                user.password = bcrypt.hashSync(user.password, salt);
             }
         }
         try {
             await users.update({
-                firstname: req.body.firstname,
-                lastname: req.body.lastname,
-                username: req.body.username,
-                email: req.body.email,
-                password: req.body.password
+                firstname: user.firstname,
+                lastname: user.lastname,
+                username: user.username,
+                email: user.email,
+                password: user.password
             }, {
                 where: {
-                    id: req.body.id
+                    id: user.id
+                },
+            }).then(result => {
+                //Result returns number of affected rows.
+                //0 means no rows were effected and the update failed.
+                if(result == 0){
+                    return res.send({
+                        error: true,
+                        type: 'error',
+                        message: 'Error editing user'
+                    })
+                }else{
+                   return res.send({
+                        error: false,
+                        type: 'success',
+                        message: 'User Updated'
+                    })
                 }
             })
-            res.status(200).send({
-                type: 'success',
-                message: "User Updated"
-            })
         } catch (err) {
-            res.status(201).send({
+            sendLog('error', err)
+            return res.send({
+                error: true,
                 type: 'error',
-                message: 'Error editing user'
+                message: err
             })
         }
     },
@@ -191,29 +217,76 @@ module.exports = {
             });
             res.send(allitems);
         } catch (err) {
-            res.status(201).send({
+            sendLog('error', err)
+            return res.send({
+                error: true,
                 type: 'error',
                 message: err
             })
         }
     },
     async getUser(req, res) {
+        let decoded = decodeToken(req);
         try {
             users.findOne({
                 where: {
-                    id: id
+                    id: decoded.user.id
                 },
                 attributes: ['id', 'firstname', 'lastname', 'username', 'email']
-            }).lean().then(user => {
+            }).then(user => {
                 // project will be the first entry of the Projects table with the title 'aProject' || null
                 // project.title will contain the name of the project
                 res.send(user);
             })
         } catch (err) {
-            res.status(201).send({
+            sendLog('error', err)
+            return res.send({
+                error: true,
                 type: 'error',
                 message: err
             })
+        }
+    },
+    async isAuth(req, res) {
+        let token = req.body.token;
+        //ICheck for null/undefined token in the request
+        if (!req.body.token) {
+            return res.send({
+                error: true,
+                color: 'error',
+                message: "Token must be provided"
+            })
+        }
+        try {
+            //Valid token, call next
+            var decoded = jwt.verify(token, jwtSecret);
+            return res.send({
+                error: false
+            })
+        } catch (err) {
+            //If error send back error message
+            switch (err.name) {
+                case 'TokenExpiredError':
+                    return res.send({
+                        error: true,
+                        color: 'error',
+                        message: 'Your Login has expired.'
+                    });
+                    break;
+                case 'JsonWebTokenError':
+                    return res.send({
+                        error: true,
+                        color: 'error',
+                        message: 'Invalid Token'
+                    });
+                    break;
+                default:
+                    res.send({
+                        error: true,
+                        color: 'error',
+                        message: err
+                    })
+            }
         }
     },
 }

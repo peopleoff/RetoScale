@@ -1,7 +1,7 @@
 {
   "name": "RetoScale",
   "short_name": "RetoScale",
-  "description": "Enter The Gungeon Items rated on the Reto-Scale.",
+  "description": "Enter The Gungeon Items rated on the RetoScale.",
   "icons": [
     {
       "src": "./img/icons/android-chrome-192x192.png",

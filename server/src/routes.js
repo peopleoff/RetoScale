@@ -1,26 +1,36 @@
-const AuthenticationController = require('./controllers/AuthenticationController');
 const AuthenticationControllerPolicy = require('./policies/AuthenticationControllerPolicy');
 const ItemControllerPolicy = require('./policies/ItemControllerPolicy');
 const User = require('./controllers/UserController');
 const Item = require('./controllers/ItemController');
+const Synergy = require('./controllers/SynergieController');
 
 //JWT middleware
-const {isAuthenticated} = require('./config/auth');
+const {
+    isAuthenticated
+} = require('./config/auth');
 
 module.exports = (app) => {
 
-    // Get Requests
+    //------Get Requests------//
     app.get('/getItems', Item.getItems);
-    app.get('/getUsers', User.getUsers);
+    app.get('/getSynergies', Synergy.getSynergies);
     app.get('/getLastUpdated', Item.getLastUpdated);
-    // Post Requests
+    //Protected Get Routes
+    //------Get Requests------//
+
+    //------Post Requests------//
     app.post('/register', AuthenticationControllerPolicy.register, User.register);
-    app.post('/addItem', ItemControllerPolicy.addItem, Item.addItem);
-    app.post('/updateItem', ItemControllerPolicy.updateItem, Item.updateItem);
-    app.post('/updateUserStatus', User.updateUserStatus);
-    app.post('/deleteItem', Item.deleteItem);
     app.post('/signIn', User.signIn);
+    //Protected Post Routes
+    app.post('/addItem', isAuthenticated, ItemControllerPolicy.addItem, Item.addItem);
+    app.post('/updateItem', isAuthenticated, ItemControllerPolicy.updateItem, Item.updateItem);
+    app.post('/updateUserStatus', isAuthenticated, User.updateUserStatus);
+    app.post('/deleteItem', isAuthenticated, Item.deleteItem);
     app.post('/getUser', isAuthenticated, User.getUser);
-    app.post('/updateUser', User.updateUser);
+    app.post('/updateUser', isAuthenticated, User.updateUser);
+    app.post('/isAuth', isAuthenticated, User.isAuth);
+    app.post('/getUsers', isAuthenticated, User.getUsers);
+    app.post('/addSyn', Synergy.addSyn);
+    //------Post Requests------//
 
 };

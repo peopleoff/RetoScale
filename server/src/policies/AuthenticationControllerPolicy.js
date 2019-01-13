@@ -15,7 +15,6 @@ module.exports = {
         const {error, value} = Joi.validate(req.body, schema);
 
         if (error) {
-            console.log(error);
             switch (error.details[0].context.key) {
                 case 'username':
                     res.send({

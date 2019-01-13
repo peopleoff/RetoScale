@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
+const {sendLog} = require('../config/logging');
 
 function jwtSignUser(user) {
     const ONE_WEEK = 60 * 60 * 24 * 7;
@@ -43,7 +44,6 @@ module.exports = {
                 })
             }
             const validPassword = loginUser.comparePassword(user_password);
-            console.log(validPassword + " this is from validPassowrd");
             if (validPassword) {
                 const userJson = loginUser.toJSON();
                 res.send({

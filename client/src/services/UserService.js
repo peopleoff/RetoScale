@@ -7,8 +7,11 @@ export default {
   signIn(data){
     return Api().post('signIn', data)
   },
-  getUsers(){
-    return Api().get('getUsers')
+  isAuth(data){
+    return Api().post('isAuth', data)
+  },
+  getUsers(data){
+    return Api().post('getUsers', data)
   },
   getUser(data){
     return Api().post('getUser', data)
@@ -17,6 +20,7 @@ export default {
     return Api().post('updateUser', data)
   },
   updateUserStatus(data){
+    console.log(data);
     return Api().post('updateUserStatus', data)
   }
 }

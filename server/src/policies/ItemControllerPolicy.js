@@ -2,6 +2,7 @@ const Joi = require('joi');
 
 module.exports = {
     addItem(req, res, next) {
+        let item = req.body.item;
         const schema = {
             name: Joi.string().required(),
             image: Joi.string().allow(null).allow(''),
@@ -12,7 +13,7 @@ module.exports = {
             notes: Joi.string().allow(null).allow(''),
         };
 
-        const {error, value} = Joi.validate(req.body, schema);
+        const {error, value} = Joi.validate(item, schema);
 
         if (error) {
             switch (error.details[0].context.key) {
@@ -49,6 +50,7 @@ module.exports = {
         }
     },
     updateItem(req, res, next) {
+        let item = req.body.item;
         const schema = {
             id: Joi.number(),
             name: Joi.string().required(),
@@ -62,7 +64,7 @@ module.exports = {
             updatedAt: Joi.date(),
         };
 
-        const {error, value} = Joi.validate(req.body, schema);
+        const {error, value} = Joi.validate(item, schema);
 
         if (error) {
             switch (error.details[0].context.key) {

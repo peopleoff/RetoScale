@@ -1,27 +1,19 @@
 <template>
   <v-container>
-    <v-responsive>
-      <v-container fill-height>
-        <v-layout align-center>
-          <v-flex>
-            <h3 class="display-3">Welcome RetroManiacs!</h3>
-            <span class="subheading">Reto-Scale is a quick and easy way to view and search different items/weapons from
-              Enter The Gungeon rated by Reto himself.</span>
-            <br>
-            <br>
-            <span class="subheading">Items are rated on a scale of 0/10 Retos <img style="height: 38px; width: 38px;"
-                src="img/reto-full.png" alt="Giant Reto Picture">
-            </span>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-responsive>
+    <v-parallax dark src="img/paralax.png" height="200" class="my-5">
+      <v-layout align-left column justify-center>
+        <h1 class="display-2 mb-3">RetoScale</h1>
+        <h4 class="subheading">
+         A ranking of items & weapons from <a href="http://dodgeroll.com/gungeon/" target="_blank"
+            rel="nofollow" class="link">Enter The Gungeon</a> based on Retromation's opinion
+        </h4>
+      </v-layout>
+    </v-parallax>
+
     <v-layout text-xs-center wrap>
       <v-flex xs12>
         <v-card>
-          <v-toolbar flat>
-            <v-toolbar-title>Reto-Scale</v-toolbar-title>
-            <v-divider class="mx-2" inset vertical></v-divider>
+          <v-toolbar flat color="primary">
             <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details color="#212121"
               class="search"></v-text-field>
             <v-dialog v-model="dialog" max-width="500px">
@@ -34,20 +26,21 @@
                   <v-container grid-list-md>
                     <v-layout wrap>
                       <v-flex xs12 sm6 md6>
-                        <v-text-field v-model="editedItem.name" label="Item Name"  :error-messages="editedNameErrors"></v-text-field>
+                        <v-text-field v-model="editedItem.name" label="Item Name" :error-messages="editedNameErrors"></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm6 md4>
                         <v-text-field v-model="editedItem.image" label="Item Image (Url)"></v-text-field>
                       </v-flex>
-                      <v-flex xs12 sm6 md2>
+                      <v-flex xs12 sm6 md2 class="hidden-sm-and-down">
                         <span v-if="!editedItem.image">Image Preview</span>
-                        <v-img v-bind:src="editedItem.image" alt="Image Preview"></v-img>
+                        <v-img v-if="editedItem.image" v-bind:src="editedItem.image" alt="Image Preview"></v-img>
                       </v-flex>
                       <v-flex xs12 sm4>
                         <v-select :items="tierTypes" label="Tier" v-model="editedItem.tier"></v-select>
                       </v-flex>
                       <v-flex xs12 sm4>
-                        <v-text-field type="number" max="15" v-model="editedItem.scale" label="Reto-Scale Number" :error-messages="editedScaleErrors"></v-text-field>
+                        <v-text-field type="number" max="15" step="0.5" v-model="editedItem.scale" label="RetoScale Number"
+                          :error-messages="editedScaleErrors"></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm4>
                         <v-select :items="itemTypes" label="Item Type" v-model="editedItem.type"></v-select>
@@ -61,14 +54,14 @@
 
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
-                  <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
+                  <v-btn color="secondaryAction" flat @click="close">Cancel</v-btn>
+                  <v-btn color="primaryAction" flat @click="save">Save</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
           </v-toolbar>
           <v-data-table :headers="tableHeaders()" :items="items" :search="search" :pagination.sync="pagination"
-            :loading="loading">
+            :loading="loading" class="elevation-15">
             <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
             <template slot="items" slot-scope="props">
               <td class="item-name pointer" @click="openWiki(props.item)">
@@ -106,6 +99,15 @@
 
 <script>
   import ItemService from '@/services/ItemService'
+
+
+  function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+  }
+
+
   export default {
     name: 'Home',
     data() {
@@ -158,14 +160,13 @@
         this.loading = false;
       },
       openWiki(item) {
-        console.log(item.name);
         let itemName = item.name.replace(" ", "_")
         window.open(`https://enterthegungeon.gamepedia.com/${itemName}`, 'Gungeon Wiki');
       },
       tableHeaders() {
         if (this.$store.state.user) {
           return [{
-              text: 'Item/Gun',
+              text: 'Item',
               align: 'center',
               value: 'name',
               width: '20%'
@@ -190,7 +191,7 @@
             },
             {
               text: 'Notes',
-              align: 'center',
+              align: 'left',
               value: 'notes',
               width: '20%'
             },
@@ -204,7 +205,7 @@
           ]
         } else {
           return [{
-              text: 'Item/Gun',
+              text: 'Item',
               align: 'center',
               value: 'name',
               width: '20%'
@@ -229,7 +230,7 @@
             },
             {
               text: 'Notes',
-              align: 'center',
+              align: 'left',
               value: 'notes',
               width: '20%'
             },
@@ -252,16 +253,16 @@
         if (scale % 1 === 0) {
           for (let i = 0; i < scale; i++) {
             html +=
-              `<img style="margin: 1px; height: 28px; width: 28px;" src="img/reto-full.png" alt="${scale} on the Reto-Scale">`
+              `<img style="margin: 1px; height: 28px; width: 28px;" src="img/reto-full.png" alt="${scale} on the RetoScale">`
           }
         } else {
           let integer = Math.floor(scale);
           for (let i = 0; i < integer; i++) {
             html +=
-              `<img style="margin: 1px; height: 28px; width: 28px;" src="img/reto-full.png" alt="${scale} on the Reto-Scale">`
+              `<img style="margin: 1px; height: 28px; width: 28px;" src="img/reto-full.png" alt="${scale} on the RetoScale">`
           }
           html +=
-            `<img style="margin: 1px; height: 28px; width: 14px;" src="img/reto-half.png" alt="${scale} on the Reto-Scale">`
+            `<img style="margin: 1px; height: 28px; width: 14px;" src="img/reto-half.png" alt="${scale} on the RetoScale">`
         }
         return html
       },
@@ -278,10 +279,14 @@
         }, 300)
       },
       deleteItem(item) {
+        let token = getCookie('token');
         let confirms = confirm('Are you sure you want to delete this item?');
         if (confirms == true) {
           try {
-            ItemService.deleteItem(item).then(response => {
+            ItemService.deleteItem({
+              item: item,
+              token: token
+            }).then(response => {
               this.response = response;
               this.close();
               this.getItems();
@@ -292,13 +297,16 @@
         }
       },
       async save() {
+        let token = getCookie('token');
         if (!this.editedItem.name || !this.editedItem.scale) {
           return
         } else {
           if (this.editedIndex > -1) {
             try {
-              console.log(this.editedItem.scale.length);
-              await ItemService.updateItem(this.editedItem).then(response => {
+              await ItemService.updateItem({
+                item: this.editedItem,
+                token: token
+              }).then(response => {
                 this.response = response;
                 if (!response.data.error) {
                   this.snack = true;
@@ -317,7 +325,10 @@
             }
           } else {
             try {
-              await ItemService.addItem(this.editedItem).then(response => {
+              await ItemService.addItem({
+                item: this.editedItem,
+                token: token
+              }).then(response => {
                 this.response = response;
                 if (!response.data.error) {
                   this.snack = true;
@@ -348,7 +359,7 @@
     },
     computed: {
       formTitle() {
-        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+        return this.editedIndex === -1 ? 'New Item' : `Edit ${this.editedItem.name}`
       },
       editedNameErrors() {
         const errors = []
@@ -391,9 +402,5 @@
 
   .item-name img {
     float: left;
-  }
-
-  .search input {
-    color: #212121;
   }
 </style>

@@ -3,14 +3,20 @@
     <TopNav />
     <v-content>
       <router-view />
+      <v-snackbar v-model="errorMessage.error" :timeout="3000" :color="errorMessage.color" v-if="errorMessage">
+        {{ errorMessage.message }}
+        <v-btn flat @click="errorMessage.error = false">Close</v-btn>
+      </v-snackbar>
     </v-content>
-    <BottomNav /> 
+    <BottomNav />
   </v-app>
 </template>
 <script>
-  import ItemService from '@/services/ItemService'
   import TopNav from '@/components/TopNav.vue'
   import BottomNav from '@/components/BottomNav.vue'
+  import {
+    mapGetters
+  } from 'vuex'
 
   export default {
     name: 'App',
@@ -22,38 +28,25 @@
       return {
       }
     },
+    computed: {
+      ...mapGetters({
+        errorMessage: 'errorMessage'
+      })
+    }
   }
 </script>
 
 <style>
-  .theme--dark.v-toolbar {
-    background-color: #80DEEA;
-    color: #303030;
-  }
-
-  .headline {
-    color: white;
-    text-decoration: none;
-  }
-
-  .search input {
-    color: #303030 !important;
-  }
-
-  .search label {
-    color: #303030 !important;
-  }
-
-  .color-dark {
-    color: #303030 !important;
-  }
-
   .pointer {
     cursor: pointer;
   }
 
-  .links {
-    color: white;
+  a {
+    color: #fff !important;
     text-decoration: none;
+  }
+
+  .link{
+    text-decoration: underline
   }
 </style>

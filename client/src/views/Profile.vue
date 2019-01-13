@@ -1,12 +1,10 @@
 <template>
     <div id="app">
-        <v-app id="inspire">
-            <v-content>
                 <v-container fluid fill-height>
                     <v-layout align-center justify-center>
                         <v-flex xs12 sm8 md4>
-                            <v-card class="elevation-12">
-                                <v-toolbar dark color="primary">
+                            <v-card class="elevation-12 mt-5">
+                                <v-toolbar color="primary">
                                     <v-toolbar-title>Profile</v-toolbar-title>
                                     <v-spacer></v-spacer>
                                 </v-toolbar>
@@ -26,7 +24,7 @@
                                 </v-card-text>
                                 <v-card-actions>
                                     <v-spacer></v-spacer>
-                                    <v-btn color="primary" @click="updateUser" v-on:keyup.enter="updateUser()">Update
+                                    <v-btn color="primaryAction"  @click="updateUser" v-on:keyup.enter="updateUser()"  :loading="loading">Update
                                         Profile</v-btn>
                                 </v-card-actions>
                             </v-card>
@@ -37,13 +35,17 @@
                         </v-flex>
                     </v-layout>
                 </v-container>
-            </v-content>
-        </v-app>
     </div>
 </template>
 
 <script>
     import UserService from '@/services/UserService'
+
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    }
 
     export default {
         name: 'Profile',
@@ -58,6 +60,7 @@
                     email: '',
                     registerKey: ''
                 },
+                loading: false,
                 snack: false,
                 snackColor: '',
                 snackText: '',
@@ -65,23 +68,44 @@
             }
         },
         mounted() {
-            this.getUser({
-                token: this.$store.state.user.token
-            });
+            this.getUser();
         },
         methods: {
-            async getUser(data) {
+            async getUser() {
                 this.loading = true;
-                this.user = (await UserService.getUser(data)).data;
+                let self = this;
+                let token = getCookie('token');
+                await UserService.getUser({
+                    token: token
+                }).then(result => {
+                    if (result.data.error) {
+                        self.snack = true;
+                        self.snackColor = result.data.type;
+                        self.snackText = result.data.message;
+                    } else {
+                        self.user = result.data;
+                    }
+                })
                 this.loading = false;
             },
             async updateUser() {
                 this.loading = true;
+                let token = getCookie('token');
                 let self = this;
-                await UserService.updateUser(this.user).then(function (result) {
-                    self.snack = true;
-                    self.snackColor = result.data.type;
-                    self.snackText = result.data.message;
+                await UserService.updateUser({
+                    user: this.user,
+                    token: token
+                }).then(function (result) {
+                    if (result.data.error) {
+                        self.snack = true;
+                        self.snackColor = result.data.type;
+                        self.snackText = result.data.message;
+                    }else{
+                        self.snack = true;
+                        self.snackColor = result.data.type;
+                        self.snackText = result.data.message;
+                    }
+
                 })
                 this.loading = false;
             }
@@ -90,17 +114,5 @@
 </script>
 
 <style scoped>
-    .scale-container {
-        display: flex;
-    }
 
-    .reto-image {
-        margin: 1px;
-    }
-
-    .item-name img {
-        float: left;
-        height: 15px;
-        width: 15px;
-    }
 </style>
