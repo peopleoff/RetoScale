@@ -65,7 +65,7 @@
             <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
             <template slot="items" slot-scope="props">
               <td class="item-name pointer" @click="openWiki(props.item)">
-                <img :src="'@/src/assets/Items/'+ formatItemName(props.item.name) + '.png'" alt=""> {{ props.item.name }}</td>
+                <img :src="'../img//Items/'+ formatItemName(props.item.name) + '.png'" alt=""> {{ props.item.name }}</td>
               <td class="text-xs-left">{{ props.item.type }}</td>
               <td class="text-xs-left">
                 <img :src="require('../../public/img/'+props.item.tier+'_Quality_Item.png')" :alt="props.item.tier + ' Tier Item'"></td>
@@ -160,7 +160,6 @@
         this.loading = false;
       },
       formatItemName(itemName){
-        console.log(itemName);
         return itemName.replace(/ +/g, "");
       },
       openWiki(item) {
