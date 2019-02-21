@@ -132,3 +132,5 @@ server/auth.json
 client/dist
 client/dist_electron
 server/config/config.js
+
+sql_backups/
