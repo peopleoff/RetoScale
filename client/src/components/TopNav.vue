@@ -4,10 +4,10 @@
             <router-link to="/" class="headline"><span>RetoScale</span></router-link>
         </v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn flat href="https://www.youtube.com/user/Retromation" target="_blank" class="hidden-xs-only">
+        <v-btn flat href="https://www.youtube.com/user/Retromation" rel="noreferrer" target="_blank" class="hidden-xs-only">
             <span class="mr-2 color-dark text-capitalize">Checkout Retromation on YouTube</span>
         </v-btn>
-        <v-btn flat href="https://www.youtube.com/user/Retromation" target="_blank" class="hidden-sm-and-up">
+        <v-btn flat href="https://www.youtube.com/user/Retromation" rel="noreferrer" target="_blank" class="hidden-sm-and-up">
             <span class="mr-2 color-dark text-capitalize">YouTube</span>
         </v-btn>
         <v-menu open-on-hover offset-y v-if="this.$store.state.user">

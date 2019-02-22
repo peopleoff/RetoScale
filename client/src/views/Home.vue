@@ -1,11 +1,11 @@
 <template>
   <v-container>
-    <v-parallax dark src="img/paralax.png" height="200" class="my-5">
+    <v-parallax dark src="img/paralax.png" alt="blue paralax image" height="200" class="my-5">
       <v-layout align-left column justify-center>
         <h1 class="display-2 mb-3">RetoScale</h1>
         <h4 class="subheading">
          A ranking of items & weapons from <a href="http://dodgeroll.com/gungeon/" target="_blank"
-            rel="nofollow" class="link">Enter The Gungeon</a> based on Retromation's opinion
+            rel="noreferrer" class="link">Enter The Gungeon</a> based on Retromation's opinion
         </h4>
       </v-layout>
     </v-parallax>
@@ -25,15 +25,11 @@
                 <v-card-text>
                   <v-container grid-list-md>
                     <v-layout wrap>
-                      <v-flex xs12 sm6 md6>
+                      <v-flex xs12>
                         <v-text-field v-model="editedItem.name" label="Item Name" :error-messages="editedNameErrors"></v-text-field>
                       </v-flex>
-                      <v-flex xs12 sm6 md4>
+                      <v-flex hidden-lg-and-down>
                         <v-text-field v-model="editedItem.image" label="Item Image (Url)"></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm6 md2 class="hidden-sm-and-down">
-                        <span v-if="!editedItem.image">Image Preview</span>
-                        <v-img v-if="editedItem.image" v-bind:src="editedItem.image" alt="Image Preview"></v-img>
                       </v-flex>
                       <v-flex xs12 sm4>
                         <v-select :items="tierTypes" label="Tier" v-model="editedItem.tier"></v-select>
@@ -65,7 +61,7 @@
             <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
             <template slot="items" slot-scope="props">
               <td class="item-name pointer" @click="openWiki(props.item)">
-                <img :src="'../img//Items/'+ formatItemName(props.item.name) + '.png'" alt=""> {{ props.item.name }}</td>
+                <img class="thumbnails" :src="'../img//Items/'+ formatItemName(props.item.image) + '.png'" :alt="props.item.name + ' Image'"> {{ props.item.name }}</td>
               <td class="text-xs-left">{{ props.item.type }}</td>
               <td class="text-xs-left">
                 <img :src="require('../../public/img/'+props.item.tier+'_Quality_Item.png')" :alt="props.item.tier + ' Tier Item'"></td>
@@ -256,16 +252,16 @@
         if (scale % 1 === 0) {
           for (let i = 0; i < scale; i++) {
             html +=
-              `<img style="margin: 1px; height: 28px; width: 28px;" src="img/reto-full.png" alt="${scale} on the RetoScale">`
+              `<img class="reto-full" src="img/reto-full.png" alt="${scale} on the RetoScale">`
           }
         } else {
           let integer = Math.floor(scale);
           for (let i = 0; i < integer; i++) {
             html +=
-              `<img style="margin: 1px; height: 28px; width: 28px;" src="img/reto-full.png" alt="${scale} on the RetoScale">`
+              `<img class="reto-full" src="img/reto-full.png" alt="${scale} on the RetoScale">`
           }
           html +=
-            `<img style="margin: 1px; height: 28px; width: 14px;" src="img/reto-half.png" alt="${scale} on the RetoScale">`
+            `<img class="reto-half" src="img/reto-half.png" alt="${scale} on the RetoScale">`
         }
         return html
       },
@@ -382,9 +378,14 @@
   }
 </script>
 
-<style scoped>
+<style>
   .scale-container {
     display: flex;
+  }
+
+  .thumbnails{
+    max-height: 15px;
+    max-width: 15px;
   }
 
   .reto-full {
@@ -394,7 +395,7 @@
   }
 
   .reto-half {
-    height: 14px;
+    height: 28px;
     width: 14px;
     margin: 1px;
   }
@@ -406,4 +407,18 @@
   .item-name img {
     float: left;
   }
+
+  @media only screen and (max-width: 600px) {
+  .reto-full {
+    height: 14px;
+    width: 14px;
+    margin: 1px;
+  }
+
+  .reto-half {
+    height: 14px;
+    width: 7px;
+    margin: 1px;
+  }
+}
 </style>
