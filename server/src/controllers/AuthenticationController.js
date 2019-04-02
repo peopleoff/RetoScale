@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-const {sendLog} = require('../config/logging');
 
 function jwtSignUser(user) {
     const ONE_WEEK = 60 * 60 * 24 * 7;

@@ -8,13 +8,18 @@ const bcrypt = require('bcryptjs');
 const salt = '$2a$10$Q/AH0MPPKyMVNzshASojgO';
 const jwt = require('jsonwebtoken');
 const registerKey = "RetroFunTimes"
-const ONE_WEEK = 60 * 60 * 24 * 7;
-const ONE_SECOND = 60;
-const {sendLog} = require('../config/logging');
+const sgMail = require('@sendgrid/mail');
+const ONE_HOUR = 60 * 60
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const {
     errorHandler
 } = require('../common/common');
+
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
 
 //jwt config
 const jwtSecret = require('../config/config').authentication.jwtSecret;
@@ -31,21 +36,21 @@ module.exports = {
     register(req, res) {
         if (!req.body) {
             return res.send({
-                error: true,
+
                 message: "Error",
                 type: "error"
             })
         }
         if (req.body.password !== req.body.confirmPassword) {
             return res.send({
-                error: true,
+
                 message: "Passwords do not match",
                 type: "error"
             })
         }
         if (req.body.registerKey !== registerKey) {
             return res.send({
-                error: true,
+
                 message: "Invalid Register Key",
                 type: "error"
             })
@@ -57,7 +62,7 @@ module.exports = {
             }).then(project => {
                 if (project) {
                     return res.send({
-                        error: true,
+
                         message: "User already exsists",
                         type: "error"
                     })
@@ -66,7 +71,7 @@ module.exports = {
                     req.body.status = 3;
                     users.create(req.body).then(response => {
                         return res.send({
-                            error: false,
+
                             message: "Thank you for registering, Please wait for your account to be approved.",
                             type: "success"
                         })
@@ -74,13 +79,110 @@ module.exports = {
                 }
             })
             .catch(err => {
-                sendLog('error', err)
                 return res.send({
-                    error: true,
+
                     type: 'error',
                     message: err
                 })
             });
+    },
+    passwordReset(req, res) {
+        if (!req.body) {
+            return res.send({
+
+                message: "No Email Found",
+                type: "error"
+            })
+        };
+        if (!validateEmail(req.body.email)) {
+            return res.send({
+
+                message: "Invalid Email",
+                type: "error"
+            })
+        };
+        let token = jwt.sign({
+            email: req.body.email
+        }, jwtSecret, {
+            expiresIn: '10m',
+        });
+        users.update({
+                reset_token: token
+            }, {
+                where: {
+                    email: req.body.email
+                }
+            })
+            .then(result => {
+                if (result[0] !== 0) {
+                    const msg = {
+                        to: req.body.email,
+                        from: 'support@ruslanbelyy.com',
+                        subject: 'Retoscale Password Reset',
+                        html: `
+                            Please use the following link to <a href="retoscale.com/reset/${token}"> reset your password </a>
+                            <br>
+                            If you did not request this password change please feel free to ignore it.
+                            <br>
+                        `,
+                    };
+                    sgMail.send(msg);
+                    return res.send({
+
+                        message: "A password reset has been sent. Please check your email for further instructions.",
+                        type: "success"
+                    })
+                } else {
+                    return res.send({
+
+                        message: "A password reset has been sent. Please check your email for further instructions.",
+                        type: "success"
+                    })
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    },
+    changePassword(req, res) {
+        if (!req.body) {
+            return res.send({
+
+                message: "Please try again",
+                type: "error"
+            })
+        };
+        // verify a token symmetric
+        jwt.verify(req.body.token, jwtSecret, function (err, decoded) {
+            if (!decoded) {
+                return res.send({
+
+                    message: "Token has expired. Please resend password reset.",
+                    type: 'error'
+                })
+            } else {
+                req.body.password = bcrypt.hashSync(req.body.password, salt);
+                users.update({
+                        password: req.body.password
+                    }, {
+                        where: {
+                            reset_token: req.body.token
+                        }
+                    })
+                    .then(result => {
+                        if (result[0] !== 0) {
+                            return res.send({
+
+                                message: "Your password has been succesfully changed",
+                                type: "success"
+                            })
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            }
+        });
     },
     signIn(req, res) {
         if (req.body.token) {
@@ -91,9 +193,7 @@ module.exports = {
                     username: decoded.username
                 })
             } catch (err) {
-                sendLog('error', err)
                 return res.send({
-                    error: true,
                     type: 'error',
                     message: err
                 })
@@ -101,7 +201,6 @@ module.exports = {
         }
         if (!req.body) {
             return res.send({
-                error: true,
                 message: "Please fill in all fields",
                 type: "error"
             })
@@ -114,7 +213,6 @@ module.exports = {
             .then(user => {
                 if (!user) {
                     return res.send({
-                        error: true,
                         message: "Username or Password is incorrect",
                         type: "error"
                     })
@@ -128,7 +226,6 @@ module.exports = {
                         });
                     } else {
                         return res.send({
-                            error: true,
                             message: 'Username or Password incorrect',
                             type: "error"
                         });
@@ -151,9 +248,7 @@ module.exports = {
                 message: "User Updated"
             })
         } catch (err) {
-            sendLog('error', err)
             return res.send({
-                error: true,
                 type: 'error',
                 message: err
             })
@@ -164,7 +259,7 @@ module.exports = {
         if (user.password) {
             if (user.password !== user.confirmPassword) {
                 return res.send({
-                    error: true,
+
                     message: "Passwords do not match",
                     type: "error"
                 })
@@ -186,24 +281,23 @@ module.exports = {
             }).then(result => {
                 //Result returns number of affected rows.
                 //0 means no rows were effected and the update failed.
-                if(result == 0){
+                if (result == 0) {
                     return res.send({
-                        error: true,
+
                         type: 'error',
                         message: 'Error editing user'
                     })
-                }else{
-                   return res.send({
-                        error: false,
+                } else {
+                    return res.send({
+
                         type: 'success',
                         message: 'User Updated'
                     })
                 }
             })
         } catch (err) {
-            sendLog('error', err)
             return res.send({
-                error: true,
+
                 type: 'error',
                 message: err
             })
@@ -217,9 +311,8 @@ module.exports = {
             });
             res.send(allitems);
         } catch (err) {
-            sendLog('error', err)
             return res.send({
-                error: true,
+
                 type: 'error',
                 message: err
             })
@@ -239,9 +332,8 @@ module.exports = {
                 res.send(user);
             })
         } catch (err) {
-            sendLog('error', err)
             return res.send({
-                error: true,
+
                 type: 'error',
                 message: err
             })
@@ -252,7 +344,7 @@ module.exports = {
         //ICheck for null/undefined token in the request
         if (!req.body.token) {
             return res.send({
-                error: true,
+
                 color: 'error',
                 message: "Token must be provided"
             })
@@ -261,28 +353,28 @@ module.exports = {
             //Valid token, call next
             var decoded = jwt.verify(token, jwtSecret);
             return res.send({
-                error: false
+
             })
         } catch (err) {
             //If error send back error message
             switch (err.name) {
                 case 'TokenExpiredError':
                     return res.send({
-                        error: true,
+
                         color: 'error',
                         message: 'Your Login has expired.'
                     });
                     break;
                 case 'JsonWebTokenError':
                     return res.send({
-                        error: true,
+
                         color: 'error',
                         message: 'Invalid Token'
                     });
                     break;
                 default:
                     res.send({
-                        error: true,
+
                         color: 'error',
                         message: err
                     })

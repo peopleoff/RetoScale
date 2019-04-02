@@ -4,9 +4,6 @@ const {
 const {
     synergies
 } = require('../models');
-const {
-    sendLog
-} = require('../config/logging');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -19,14 +16,13 @@ module.exports = {
         try {
             await items.create(item);
             res.status(200).send({
-                error: false,
+                
                 type: 'success',
                 message: "Item Added"
             })
         } catch (err) {
-            sendLog('error', err)
             return res.send({
-                error: true,
+                
                 type: 'error',
                 message: err
             })
@@ -52,14 +48,12 @@ module.exports = {
                 }
             })
             res.status(200).send({
-                error: false,
                 type: 'success',
                 message: "Item Updated"
             })
         } catch (err) {
-            sendLog('error', err)
             return res.send({
-                error: true,
+                
                 type: 'error',
                 message: err
             })
@@ -70,9 +64,8 @@ module.exports = {
             const allitems = await items.findAll();
             res.send(allitems);
         } catch (err) {
-            sendLog('error', err)
             return res.send({
-                error: true,
+                
                 type: 'error',
                 message: err
             })
@@ -91,9 +84,8 @@ module.exports = {
                 res.send(timeStamp);
             })
         } catch (err) {
-            sendLog('error', err)
             return res.send({
-                error: true,
+                
                 type: 'error',
                 message: err
             })
@@ -108,15 +100,14 @@ module.exports = {
                 }
             }).then(function (result) {
                 res.status(200).send({
-                    error: false,
+                    
                     type: 'success',
                     message: "Item Deleted"
                 })
             });
         } catch (err) {
-            sendLog('error', err)
             return res.send({
-                error: true,
+                
                 type: 'error',
                 message: err
             })

@@ -18,19 +18,19 @@ module.exports = {
             switch (error.details[0].context.key) {
                 case 'username':
                     res.send({
-                        error: true,
+                        
                         message: 'Login must be a string'
                     });
                     break;
                 case 'password':
                     res.send({
-                        error: true,
+                        
                         message: `The password provided must be greater then 4 characters.`
                     });
                     break;
                 default:
                     res.send({
-                        error: true,
+                        
                         message: error
                     })
             }
@@ -50,13 +50,13 @@ module.exports = {
             switch (error.details[0].context.key) {
                 case 'newPassword2':
                     res.send({
-                        error: true,
+                        
                         message: `The password provided must be greater then 5 characters.`
                     });
                     break;
                 default:
                     res.send({
-                        error: true,
+                        
                         message: error
                     })
             }

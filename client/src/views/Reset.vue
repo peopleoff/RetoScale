@@ -5,20 +5,21 @@
                 <v-flex xs12 sm8 md4>
                     <v-card class="elevation-12 mt-5">
                         <v-toolbar color="primary">
-                            <v-toolbar-title>Reset Password</v-toolbar-title>
+                            <v-toolbar-title>Change Password</v-toolbar-title>
                             <v-spacer></v-spacer>
                         </v-toolbar>
                         <v-card-text>
                             <h3>Enter your email address and we will send you a link to reset your password.</h3>
                             <v-form>
-                                <v-text-field prepend-icon="email" name="email" label="Enter your email address"
-                                    type="email" :error-messages="emailErrors" v-model="user.email"></v-text-field>
+                                <v-text-field prepend-icon="lock" name="password" label="New Password" type="password"
+                                    v-model="password" :error-messages="passwordErrors"></v-text-field>
+                                <v-text-field prepend-icon="lock" name="confirmPassword" label="Confirm New Password"
+                                    type="password" v-model="confirmPassword" :error-messages="confirmPasswordErrors"></v-text-field>
                             </v-form>
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="primaryAction" @click="passwordReset" :loading="loading">Reset Password
-                            </v-btn>
+                            <v-btn color="primaryAction" @click="changePassword" :loading="loading">Change Password</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-flex>
@@ -35,16 +36,15 @@
     } from 'vuex'
     import {
         required,
-        email,
+        sameAs,
         minLength
     } from 'vuelidate/lib/validators'
     export default {
         name: 'PasswordReset',
         data() {
             return {
-                user: {
-                    email: '',
-                },
+                password: '',
+                confirmPassword: '',
                 loading: false
             }
         },
@@ -53,14 +53,14 @@
                 'ADD_USER',
                 'ADD_ERROR'
             ]),
-            passwordReset: function () {
+            changePassword: function () {
                 this.loading = true;
-                this.$v.$touch();
+                this.$v.$touch()
                 if (this.$v.$invalid) {
                     this.loading = false;
                     return
                 } else {
-                    UserService.passwordReset(this.user)
+                    UserService.changePassword({password: this.password, confirmPassword: this.confirmPassword, token: this.$route.params.token})
                         .then(response => {
                             this.ADD_ERROR(response.data);
                             this.loading = false;
@@ -72,29 +72,42 @@
                 }
             },
         },
-        validations: {
-            user: {
-                email: {
-                    minLength: minLength(4),
-                    email,
-                    required,
-                },
-            }
-        },
-        computed: {
-            emailErrors() {
+        computed:{
+             passwordErrors() {
                 const errors = []
-                if (!this.$v.user.email.$dirty) {
+                if (!this.$v.password.$dirty) {
                     return errors
                 }
-                if (!this.$v.user.email.email) {
-                    errors.push('Must be valid e-mail')
+                if (!this.$v.password.minLength) {
+                    errors.push(`Must be at least ${this.$v.password.$params.minLength.min} characters long`)
                 }
-                if (!this.$v.user.email.required) {
-                    errors.push('E-mail is required')
+                if (!this.$v.password.required) {
+                    errors.push('Password is required')
                 }
                 return errors
-            }
+            },
+            confirmPasswordErrors() {
+                const errors = []
+                if (!this.$v.confirmPassword.$dirty) {
+                    return errors
+                }
+                if (!this.$v.confirmPassword.$model) {
+                    errors.push('Can not be empty')
+                }
+                if (!this.$v.confirmPassword.sameAsPassword) {
+                    errors.push('Passwords must match')
+                }
+                return errors
+            },
+        },
+        validations: {
+            password: {
+                required,
+                minLength: minLength(6)
+            },
+            confirmPassword: {
+                sameAsPassword: sameAs('password')
+            },
         }
     }
 </script>

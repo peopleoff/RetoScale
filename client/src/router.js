@@ -9,6 +9,7 @@ import Users from './views/Users.vue'
 import Profile from './views/Profile.vue'
 import Privacy from './views/Privacy.vue'
 import PasswordReset from './views/PasswordReset.vue'
+import Reset from './views/Reset.vue'
 import PageNotFound from './views/PageNotFound.vue'
 
 
@@ -81,6 +82,11 @@ const router = new Router({
       component: Register
     },
     {
+      path: '/Reset/:token',
+      name: 'Reset',
+      component: Reset
+    },
+    {
       path: '/Login',
       name: 'Login',
       component: Login,
@@ -98,17 +104,7 @@ const router = new Router({
     {
       path: '/PasswordReset',
       name: 'PasswordReset',
-      component: PasswordReset,
-      beforeEnter: (to, from, next) => {
-        if (store.state.user) {
-          next();
-        } else {
-          next({
-            path: '/',
-            name: 'home'
-          });
-        }
-      }
+      component: PasswordReset
     },
     //Protected Routes
     {

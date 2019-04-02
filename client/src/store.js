@@ -22,6 +22,7 @@ export default new Vuex.Store({
     },
     ADD_ERROR: (state, error) => {
       state.error = error;
+      state.error.show = true;
     },
     SIGN_OUT: (state) => {
       state.user = null;

@@ -3,20 +3,18 @@ const ONE_WEEK = 60 * 60 * 24 * 7;
 const {
     users
 } = require('../models');
-const {sendLog} = require('./logging');
-
 //jwt config
 const jwtSecret = require('./config').authentication.jwtSecret;
 
 module.exports = {
     isAuthenticated: function (req, res, next) {
-        let token = req.body.token;
+        let token = req.headers.authorization.replace('Bearer ','');
         //ICheck for null/undefined token in the request
-        if (!req.body.token) {
+        if (!token) {
             return res.send({
-                error: true,
+                
                 color: 'error',
-                message: "Token must be provided"
+                message: "Please login to continue"
             })
         }
         try {
@@ -30,7 +28,7 @@ module.exports = {
                     //If user is not active
                     if(user.status_id !== 2){
                         return res.send({
-                            error: true,
+                            
                             color: 'error',
                             message: 'User is not active'
                         });
@@ -39,9 +37,8 @@ module.exports = {
                     }
                 })
                 .catch(err => {
-                    sendLog('error', err)
                     return res.send({
-                        error: true,
+                        
                         type: 'error',
                         message: err
                     })
@@ -51,21 +48,21 @@ module.exports = {
             switch (err.name) {
                 case 'TokenExpiredError':
                     return res.send({
-                        error: true,
+                        
                         color: 'error',
                         message: 'Your Login has expired.'
                     });
                     break;
                 case 'JsonWebTokenError':
                     return res.send({
-                        error: true,
+                        
                         color: 'error',
                         message: 'Invalid Token'
                     });
                     break;
                 default:
                     res.send({
-                        error: true,
+                        
                         color: 'error',
                         message: 'Error, Please try again'
                     })
@@ -73,15 +70,14 @@ module.exports = {
         }
     },
     decodeToken(req, res, next) {
-        let token = req.body.token;
+        let token = req.headers.authorization.replace('Bearer ',''); ;
         try {
             var decoded = jwt.verify(token, jwtSecret);
             return decoded;
         } catch (err) {
             // err
-            sendLog('error', err)
             return res.send({
-                error: true,
+                
                 type: 'error',
                 message: err
             })

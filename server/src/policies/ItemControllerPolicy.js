@@ -19,28 +19,28 @@ module.exports = {
             switch (error.details[0].context.key) {
                 case 'name':
                     res.status(201).send({
-                        error: true,
+                        
                         type: 'error',
                         message: 'Name is required'
                     });
                     break;
                 case 'scale':
                     res.status(201).send({
-                        error: true,
+                        
                         type: 'error',
                         message: `Scale must be a number`
                     });
                     break;
                 case 'notes':
                     res.status(201).send({
-                        error: true,
+                        
                         type: 'error',
                         message: `Notes must be a string`
                     });
                     break;
                 default:
                     res.status(201).send({
-                        error: true,
+                        
                         type: 'error',
                         message: error.data.details
                     })
@@ -70,21 +70,21 @@ module.exports = {
             switch (error.details[0].context.key) {
                 case 'name':
                     res.status(201).send({
-                        error: true,
+                        
                         type: 'error',
                         message: "Item Updated"
                     });
                     break;
                 case 'scale':
                     res.status(201).send({
-                        error: true,
+                        
                         type: 'error',
                         message: `Scale must be a number between 0 - 15`
                     });
                     break;
                 default:
                     res.status(201).send({
-                        error: true,
+                        
                         type: 'error',
                         message: error.data.details
                     })

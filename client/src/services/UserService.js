@@ -20,7 +20,12 @@ export default {
     return Api().post('updateUser', data)
   },
   updateUserStatus(data){
-    console.log(data);
     return Api().post('updateUserStatus', data)
+  },
+  passwordReset(data){
+    return Api().post('passwordReset', data)
+  },
+  changePassword(data){
+    return Api().post('changePassword', data)
   }
 }

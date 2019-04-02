@@ -3,9 +3,9 @@
     <TopNav />
     <v-content>
       <router-view />
-      <v-snackbar v-model="errorMessage.error" :timeout="3000" :color="errorMessage.color" v-if="errorMessage">
+      <v-snackbar v-model="errorMessage.show" :timeout="3000" :color="errorMessage.type" v-if="errorMessage" bottom>
         {{ errorMessage.message }}
-        <v-btn flat @click="errorMessage.error = false">Close</v-btn>
+        <v-btn flat @click="errorMessage.show = false">Close</v-btn>
       </v-snackbar>
     </v-content>
     <BottomNav />
@@ -25,8 +25,7 @@
       BottomNav
     },
     data() {
-      return {
-      }
+      return {}
     },
     computed: {
       ...mapGetters({
@@ -43,10 +42,15 @@
 
   a {
     color: #fff !important;
-    text-decoration: none;
   }
 
-  .link{
+  .link {
     text-decoration: underline
+  }
+
+  @media only screen and (max-width: 1264px) {
+    table.v-table tbody td:not(:nth-child(1)){
+      padding: 0 12px;
+    }
   }
 </style>

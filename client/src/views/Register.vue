@@ -11,24 +11,28 @@
                         <v-card-text>
                             <v-form>
                                 <v-text-field prepend-icon="person" name="firstname" label="First Name" type="text"
-                                    v-model.trim.lazy="$v.user.firstname.$model" :error-messages="firstnameErrors"></v-text-field>
+                                    v-model.trim.lazy="$v.user.firstname.$model" :error-messages="firstnameErrors">
+                                </v-text-field>
                                 <v-text-field prepend-icon="person" name="lastname" label="Last Name" type="text"
-                                    v-model.trim.lazy="$v.user.lastname.$model" :error-messages="lastnameErrors"></v-text-field>
+                                    v-model.trim.lazy="$v.user.lastname.$model" :error-messages="lastnameErrors">
+                                </v-text-field>
                                 <v-text-field prepend-icon="person" name="username" label="Username" type="text"
                                     v-model="user.username" :error-messages="usernameErrors"></v-text-field>
                                 <v-text-field prepend-icon="lock" name="password" label="Password" type="password"
                                     v-model="user.password" :error-messages="passwordErrors"></v-text-field>
-                                <v-text-field prepend-icon="lock" name="confirmPassword" label="Confirm Password" type="password"
-                                    v-model="user.confirmPassword" :error-messages="confirmPasswordErrors"></v-text-field>
-                                <v-text-field prepend-icon="email" name="email" label="Email" type="email" v-model="user.email"
-                                    :error-messages="emailErrors"></v-text-field>
-                                <v-text-field prepend-icon="lock" name="key" label="Register Key" type="text" v-model="user.registerKey"
-                                    :error-messages="registerKeyErrors"></v-text-field>
+                                <v-text-field prepend-icon="lock" name="confirmPassword" label="Confirm Password"
+                                    type="password" v-model="user.confirmPassword"
+                                    :error-messages="confirmPasswordErrors"></v-text-field>
+                                <v-text-field prepend-icon="email" name="email" label="Email" type="email"
+                                    v-model="user.email" :error-messages="emailErrors"></v-text-field>
+                                <v-text-field prepend-icon="lock" name="key" label="Register Key" type="text"
+                                    v-model="user.registerKey" :error-messages="registerKeyErrors"></v-text-field>
                             </v-form>
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="primaryAction"  @click="Register" v-on:keyup.enter="register()" :disabled=$v.$invalid>Register</v-btn>
+                            <v-btn color="primaryAction" @click="Register" v-on:keyup.enter="register()"
+                                :disabled=$v.$invalid>Register</v-btn>
                         </v-card-actions>
                     </v-card>
                     <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
@@ -55,6 +59,9 @@
 
 <script>
     import UserService from '@/services/UserService'
+        import {
+        mapMutations
+    } from 'vuex'
     import {
         required,
         minLength,
@@ -113,22 +120,17 @@
             }
         },
         methods: {
+            ...mapMutations([
+                'ADD_USER',
+                'ADD_ERROR'
+            ]),
             Register: function () {
                 this.$v.$touch()
                 if (this.$v.$invalid) {
                     return
                 } else {
                     UserService.Register(this.user).then(response => {
-                        if (response.data.error) {
-                            console.log(response);
-                            this.snack = true;
-                            this.snackColor = response.data.type;
-                            this.snackText = response.data.message;
-                        } else {
-                            this.snack = true;
-                            this.snackColor = response.data.type;
-                            this.snackText = response.data.message;
-                        }
+                        this.ADD_ERROR(response.data)
                     })
                 }
             },

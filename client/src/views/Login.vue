@@ -25,10 +25,6 @@
                         </v-card-actions>
                     </v-card>
                 </v-flex>
-                <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
-                    {{ snackText }}
-                    <v-btn flat @click="snack = false">Close</v-btn>
-                </v-snackbar>
             </v-layout>
         </v-container>
         <v-container fluid fill-height>
@@ -36,8 +32,7 @@
                 <v-flex xs12 sm8 md4 offset-sm2 offset-md4>
                     <v-card>
                         <v-card-title class="justify-center">
-                            <h3 class="text-xs-center">Need an account? <router-link to="/register" class="white--text">Register
-                                    Here</router-link>
+                            <h3 class="text-xs-center">Need an account? <router-link to="/register" class="white--text">Register Here</router-link>
                             </h3>
                         </v-card-title>
                     </v-card>
@@ -67,15 +62,13 @@
                 },
                 loading: false,
                 rememberme: false,
-                snack: false,
-                snackColor: '',
-                snackText: '',
                 status: null
             }
         },
         methods: {
             ...mapMutations([
-                'ADD_USER'
+                'ADD_USER',
+                'ADD_ERROR'
             ]),
             signIn: function () {
                 this.$v.$touch();
@@ -85,10 +78,8 @@
                 } else {
                     UserService.signIn(this.user).then(response => {
                          this.loading = false;
-                        if (response.data.error) {
-                            this.snack = true;
-                            this.snackColor = response.data.type;
-                            this.snackText = response.data.message;
+                        if (response.data.message) {
+                            this.ADD_ERROR(response.data)
                         } else {
                             var today = new Date();
                             var expire = new Date();

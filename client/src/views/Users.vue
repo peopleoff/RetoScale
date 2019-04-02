@@ -54,12 +54,6 @@
 <script>
     import UserService from '@/services/UserService'
 
-    function getCookie(name) {
-        var value = "; " + document.cookie;
-        var parts = value.split("; " + name + "=");
-        if (parts.length == 2) return parts.pop().split(";").shift();
-    }
-
     export default {
         name: 'Users',
         data() {
@@ -111,10 +105,7 @@
             async getUsers() {
                 this.loading = true;
                 let self = this;
-                let token = getCookie('token');
-                await UserService.getUsers({
-                    token: token
-                }).then(result => {
+                await UserService.getUsers().then(result => {
                     if (result.data.error) {
                         self.snack = true;
                         self.snackColor = result.data.type;
@@ -127,7 +118,6 @@
             },
             async save() {
                 let self = this;
-                let token = getCookie('token');
                 try {
                     if (this.editedItem.status_id == "Active") {
                         this.editedItem.status_id = 2
@@ -137,7 +127,6 @@
                     this.dialog = false;
                     await UserService.updateUserStatus({
                         user: this.editedItem,
-                        token: token
                     }).then(function (result) {
                         self.snack = true;
                         self.snackColor = result.data.type;

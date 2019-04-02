@@ -1,11 +1,11 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-parallax dark src="img/paralax.png" alt="blue paralax image" height="200" class="my-5">
       <v-layout align-left column justify-center>
         <h1 class="display-2 mb-3">RetoScale</h1>
         <h4 class="subheading">
-         A ranking of items & weapons from <a href="http://dodgeroll.com/gungeon/" target="_blank"
-            rel="noreferrer" class="link">Enter The Gungeon</a> based on Retromation's opinion
+          A ranking of items & weapons from <a href="http://dodgeroll.com/gungeon/" target="_blank" rel="noreferrer"
+            class="link">Enter The Gungeon</a> based on Retromation's opinion
         </h4>
       </v-layout>
     </v-parallax>
@@ -17,7 +17,6 @@
             <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details color="#212121"
               class="search"></v-text-field>
             <v-dialog v-model="dialog" max-width="500px">
-              <v-btn slot="activator" dark flat class="mb-2 color-dark" v-if="loggedIn()">New Item</v-btn>
               <v-card>
                 <v-card-title>
                   <span class="headline">{{ formTitle }}</span>
@@ -26,23 +25,11 @@
                   <v-container grid-list-md>
                     <v-layout wrap>
                       <v-flex xs12>
-                        <v-text-field v-model="editedItem.name" label="Item Name" :error-messages="editedNameErrors"></v-text-field>
-                      </v-flex>
-                      <v-flex hidden-lg-and-down>
-                        <v-text-field v-model="editedItem.image" label="Item Image (Url)"></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm4>
-                        <v-select :items="tierTypes" label="Tier" v-model="editedItem.tier"></v-select>
-                      </v-flex>
-                      <v-flex xs12 sm4>
-                        <v-text-field type="number" max="15" step="0.5" v-model="editedItem.scale" label="RetoScale Number"
-                          :error-messages="editedScaleErrors"></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm4>
-                        <v-select :items="itemTypes" label="Item Type" v-model="editedItem.type"></v-select>
+                        <v-text-field type="number" max="15" step="0.5" v-model="editedItem.scale"
+                          label="RetoScale Number" :error-messages="editedScaleErrors"></v-text-field>
                       </v-flex>
                       <v-flex xs12>
-                        <v-text-field type="text-area" v-model="editedItem.notes" label="Notes"></v-text-field>
+                        <v-textarea v-model="editedItem.notes" label="Notes" no-resize></v-textarea>
                       </v-flex>
                     </v-layout>
                   </v-container>
@@ -51,7 +38,7 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="secondaryAction" flat @click="close">Cancel</v-btn>
-                  <v-btn color="primaryAction" flat @click="save">Save</v-btn>
+                  <v-btn color="primaryAction" flat @click="updateItem">Save</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -61,10 +48,13 @@
             <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
             <template slot="items" slot-scope="props">
               <td class="item-name pointer" @click="openWiki(props.item)">
-                <img class="thumbnails" :src="'../img//Items/'+ formatItemName(props.item.image) + '.png'" :alt="props.item.name + ' Image'"> {{ props.item.name }}</td>
+                <img class="thumbnails" :src="'../img//Items/'+ formatItemName(props.item.image) + '.png'"
+                  :alt="props.item.name + ' Image'"> {{ props.item.name }}
+              </td>
               <td class="text-xs-left">{{ props.item.type }}</td>
               <td class="text-xs-left">
-                <img :src="require('../../public/img/'+props.item.tier+'_Quality_Item.png')" :alt="props.item.tier + ' Tier Item'"></td>
+                <img :src="require('../../public/img/'+props.item.tier+'_Quality_Item.png')"
+                  :alt="props.item.tier + ' Tier Item'"></td>
               <td class="text-xs-left" style="padding: 5px 0;">
                 <div class="scale-container" slot="activator" v-html="displayScale(props.item.scale)"></div>
                 ({{props.item.scale}})
@@ -74,9 +64,6 @@
                 <v-icon small class="mr-2" @click="editItem(props.item)">
                   edit
                 </v-icon>
-                <v-icon small @click="deleteItem(props.item)">
-                  delete
-                </v-icon>
               </td>
             </template>
             <v-alert slot="no-results" :value="true" color="error" icon="warning">
@@ -85,24 +72,15 @@
           </v-data-table>
         </v-card>
       </v-flex>
-      <v-snackbar v-model="snack" :timeout="3000" :color="snackColor">
-        {{ snackText }}
-        <v-btn flat @click="snack = false">Close</v-btn>
-      </v-snackbar>
     </v-layout>
   </v-container>
 </template>
 
 <script>
   import ItemService from '@/services/ItemService'
-
-
-  function getCookie(name) {
-    var value = "; " + document.cookie;
-    var parts = value.split("; " + name + "=");
-    if (parts.length == 2) return parts.pop().split(";").shift();
-  }
-
+  import {
+    mapMutations
+  } from 'vuex'
 
   export default {
     name: 'Home',
@@ -110,27 +88,8 @@
       return {
         search: '',
         loading: true,
-        response: null,
-        itemTypes: [
-          'Weapon',
-          'Passive',
-          'Active'
-        ],
-        tierTypes: [
-          'S',
-          'A',
-          'B',
-          'C',
-          'D',
-          'None'
-        ],
         items: [],
         editedItem: {
-          name: '',
-          image: '',
-          description: '',
-          tier: '',
-          type: '',
           scale: 0,
           notes: ''
         },
@@ -140,22 +99,21 @@
           rowsPerPage: 25,
           sortBy: 'scale',
           descending: true,
-        },
-        snack: false,
-        snackColor: '',
-        snackText: '',
-        status: null
+        }
       }
     },
     mounted() {
       this.getItems();
     },
     methods: {
+      ...mapMutations([
+        'ADD_ERROR'
+      ]),
       async getItems() {
         this.items = (await ItemService.getItems()).data;
         this.loading = false;
       },
-      formatItemName(itemName){
+      formatItemName(itemName) {
         return itemName.replace(/ +/g, "");
       },
       openWiki(item) {
@@ -277,78 +235,14 @@
           this.editedIndex = -1
         }, 300)
       },
-      deleteItem(item) {
-        let token = getCookie('token');
-        let confirms = confirm('Are you sure you want to delete this item?');
-        if (confirms == true) {
-          try {
-            ItemService.deleteItem({
-              item: item,
-              token: token
-            }).then(response => {
-              this.response = response;
-              this.close();
-              this.getItems();
-            })
-          } catch (error) {
-            console.log(error);
-          }
-        }
-      },
-      async save() {
-        let token = getCookie('token');
-        if (!this.editedItem.name || !this.editedItem.scale) {
-          return
-        } else {
-          if (this.editedIndex > -1) {
-            try {
-              await ItemService.updateItem({
-                item: this.editedItem,
-                token: token
-              }).then(response => {
-                this.response = response;
-                if (!response.data.error) {
-                  this.snack = true;
-                  this.snackColor = response.data.type;
-                  this.snackText = response.data.message;
-                  this.close();
-                  this.getItems();
-                } else {
-                  this.snack = true;
-                  this.snackColor = response.data.type;
-                  this.snackText = response.data.message;
-                }
-              })
-            } catch (error) {
-              console.log(error);
-            }
-          } else {
-            try {
-              await ItemService.addItem({
-                item: this.editedItem,
-                token: token
-              }).then(response => {
-                this.response = response;
-                if (!response.data.error) {
-                  this.snack = true;
-                  this.snackColor = response.data.type;
-                  this.snackText = response.data.message;
-                  this.close();
-                  this.getItems();
-                } else {
-                  this.snack = true;
-                  this.snackColor = response.data.type;
-                  this.snackText = response.data.message;
-                }
-                this.close();
-                this.getItems();
-              })
-            } catch (error) {
-              console.log(error);
-            }
-          }
-          this.close()
-        }
+      async updateItem() {
+        await ItemService.updateItem({
+          item: this.editedItem
+        }).then(response => {
+          this.ADD_ERROR(response.data);
+          this.close();
+          this.getItems();
+        })
       }
     },
     watch: {
@@ -383,7 +277,7 @@
     display: flex;
   }
 
-  .thumbnails{
+  .thumbnails {
     max-height: 15px;
     max-width: 15px;
   }
@@ -409,16 +303,16 @@
   }
 
   @media only screen and (max-width: 600px) {
-  .reto-full {
-    height: 14px;
-    width: 14px;
-    margin: 1px;
-  }
+    .reto-full {
+      height: 14px;
+      width: 14px;
+      margin: 1px;
+    }
 
-  .reto-half {
-    height: 14px;
-    width: 7px;
-    margin: 1px;
+    .reto-half {
+      height: 14px;
+      width: 7px;
+      margin: 1px;
+    }
   }
-}
 </style>
