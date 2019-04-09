@@ -56,8 +56,14 @@ function isAuth(to, from, next) {
 const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
-  routes: [{
+  routes: [
+    {
       path: '/',
+      name: 'home',
+      component: Home
+    },
+    {
+      path: '/home',
       name: 'home',
       component: Home
     },

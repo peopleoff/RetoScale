@@ -16,13 +16,11 @@ module.exports = {
         try {
             await items.create(item);
             res.status(200).send({
-                
                 type: 'success',
                 message: "Item Added"
             })
         } catch (err) {
             return res.send({
-                
                 type: 'error',
                 message: err
             })
@@ -65,7 +63,6 @@ module.exports = {
             res.send(allitems);
         } catch (err) {
             return res.send({
-                
                 type: 'error',
                 message: err
             })
@@ -100,14 +97,12 @@ module.exports = {
                 }
             }).then(function (result) {
                 res.status(200).send({
-                    
                     type: 'success',
                     message: "Item Deleted"
                 })
             });
         } catch (err) {
             return res.send({
-                
                 type: 'error',
                 message: err
             })

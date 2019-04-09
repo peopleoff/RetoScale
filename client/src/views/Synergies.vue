@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-        <v-parallax dark src="img/paralax.png" height="200" class="my-5">
+        <v-parallax dark :src="displayImage('paralax')" height="200" class="my-5">
             <v-layout align-left column justify-center>
                 <h1 class="display-2 mb-3">RetoScale</h1>
                 <h4 class="subheading">
@@ -122,6 +122,9 @@
             formatItemName(itemName) {
                 return itemName.replace(/ +/g, "");
             },
+            displayImage(image) {
+                return `img/png/${image}.png`
+            },
             tableHeaders() {
                 if (this.$store.state.user) {
                     return [{
@@ -221,16 +224,16 @@
                 if (scale % 1 === 0) {
                     for (let i = 0; i < scale; i++) {
                         html +=
-                            `<img style="margin: 1px; height: 28px; width: 28px;" src="img/reto-full.png" alt="${scale} on the RetoScale">`
+                            `<img style="margin: 1px; height: 28px; width: 28px;" src="${this.displayImage('reto-full')}" alt="${scale} on the RetoScale">`
                     }
                 } else {
                     let integer = Math.floor(scale);
                     for (let i = 0; i < integer; i++) {
                         html +=
-                            `<img style="margin: 1px; height: 28px; width: 28px;" src="img/reto-full.png" alt="${scale} on the RetoScale">`
+                            `<img style="margin: 1px; height: 28px; width: 28px;" src="${this.displayImage('reto-full')}" alt="${scale} on the RetoScale">`
                     }
                     html +=
-                        `<img style="margin: 1px; height: 28px; width: 14px;" src="img/reto-half.png" alt="${scale} on the RetoScale">`
+                        `<img style="margin: 1px; height: 28px; width: 14px;" src="${this.displayImage('reto-half')}" alt="${scale} on the RetoScale">`
                 }
                 return html
             },

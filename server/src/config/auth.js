@@ -12,7 +12,6 @@ module.exports = {
         //ICheck for null/undefined token in the request
         if (!token) {
             return res.send({
-                
                 color: 'error',
                 message: "Please login to continue"
             })
@@ -28,7 +27,6 @@ module.exports = {
                     //If user is not active
                     if(user.status_id !== 2){
                         return res.send({
-                            
                             color: 'error',
                             message: 'User is not active'
                         });
@@ -38,7 +36,6 @@ module.exports = {
                 })
                 .catch(err => {
                     return res.send({
-                        
                         type: 'error',
                         message: err
                     })

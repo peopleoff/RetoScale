@@ -9,7 +9,6 @@ const salt = '$2a$10$Q/AH0MPPKyMVNzshASojgO';
 const jwt = require('jsonwebtoken');
 const registerKey = "RetroFunTimes"
 const sgMail = require('@sendgrid/mail');
-const ONE_HOUR = 60 * 60
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const {
@@ -340,15 +339,6 @@ module.exports = {
         }
     },
     async isAuth(req, res) {
-        let token = req.body.token;
-        //ICheck for null/undefined token in the request
-        if (!req.body.token) {
-            return res.send({
-
-                color: 'error',
-                message: "Token must be provided"
-            })
-        }
         try {
             //Valid token, call next
             var decoded = jwt.verify(token, jwtSecret);
@@ -360,21 +350,18 @@ module.exports = {
             switch (err.name) {
                 case 'TokenExpiredError':
                     return res.send({
-
                         color: 'error',
                         message: 'Your Login has expired.'
                     });
                     break;
                 case 'JsonWebTokenError':
                     return res.send({
-
                         color: 'error',
                         message: 'Invalid Token'
                     });
                     break;
                 default:
                     res.send({
-
                         color: 'error',
                         message: err
                     })

@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-parallax dark src="img/paralax.png" alt="blue paralax image" height="200" class="my-5">
+    <v-parallax dark :src="displayImage('paralax')" alt="blue paralax image" height="200" class="my-5">
       <v-layout align-left column justify-center>
         <h1 class="display-2 mb-3">RetoScale</h1>
         <h4 class="subheading">
@@ -98,12 +98,12 @@
         pagination: {
           rowsPerPage: 25,
           sortBy: 'scale',
-          descending: true,
+          descending: true
         }
       }
     },
     mounted() {
-      this.getItems();
+        this.getItems();
     },
     methods: {
       ...mapMutations([
@@ -115,6 +115,9 @@
       },
       formatItemName(itemName) {
         return itemName.replace(/ +/g, "");
+      },
+      displayImage(image) {
+        return `img/png/${image}.png`
       },
       openWiki(item) {
         let itemName = item.name.replace(" ", "_")
@@ -210,16 +213,16 @@
         if (scale % 1 === 0) {
           for (let i = 0; i < scale; i++) {
             html +=
-              `<img class="reto-full" src="img/reto-full.png" alt="${scale} on the RetoScale">`
+              `<img class="reto-full" src="${this.displayImage('reto-full')}" alt="${scale} on the RetoScale">`
           }
         } else {
           let integer = Math.floor(scale);
           for (let i = 0; i < integer; i++) {
             html +=
-              `<img class="reto-full" src="img/reto-full.png" alt="${scale} on the RetoScale">`
+              `<img class="reto-full" src="${this.displayImage('reto-full')}" alt="${scale} on the RetoScale">`
           }
           html +=
-            `<img class="reto-half" src="img/reto-half.png" alt="${scale} on the RetoScale">`
+            `<img class="reto-half" src="${this.displayImage('reto-half')}" alt="${scale} on the RetoScale">`
         }
         return html
       },

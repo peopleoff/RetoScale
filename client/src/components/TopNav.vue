@@ -10,12 +10,12 @@
             </v-avatar>
             <span class="mr-2 color-dark text-capitalize">Items</span>
         </v-btn>
-        <v-btn flat to="/synergies">
+        <!-- <v-btn flat to="/synergies">
             <v-avatar size="16px" class="mr-2">
                 <img src="img/synergie.png">
             </v-avatar>
             <span class="mr-2 color-dark text-capitalize">Synergies</span>
-        </v-btn>
+        </v-btn> -->
         <v-btn flat href="https://www.youtube.com/user/Retromation" rel="noreferrer">
             <v-avatar size="16px" class="mr-2">
                 <img src="img/youtube.png">

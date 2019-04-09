@@ -10,7 +10,6 @@ let token = getCookie('token');
 export default () => {
   return axios.create({
     baseURL: process.env.VUE_APP_API,
-    timeout: 1000,
     headers: {
       Authorization: "Bearer " + token
     }
