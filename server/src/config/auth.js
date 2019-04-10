@@ -9,6 +9,8 @@ const jwtSecret = require('./config').authentication.jwtSecret;
 module.exports = {
     isAuthenticated: function (req, res, next) {
         let token = req.headers.authorization.replace('Bearer ','');
+
+        console.log(req.headers);
         //ICheck for null/undefined token in the request
         if (!token) {
             return res.send({
@@ -42,17 +44,16 @@ module.exports = {
                 });
         } catch (err) {
             //If error send back error message
+            console.log(err);
             switch (err.name) {
                 case 'TokenExpiredError':
                     return res.send({
-                        
                         color: 'error',
                         message: 'Your Login has expired.'
                     });
                     break;
                 case 'JsonWebTokenError':
                     return res.send({
-                        
                         color: 'error',
                         message: 'Invalid Token'
                     });

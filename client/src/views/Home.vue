@@ -217,6 +217,7 @@
           }
         } else {
           let integer = Math.floor(scale);
+
           for (let i = 0; i < integer; i++) {
             html +=
               `<img class="reto-full" src="${this.displayImage('reto-full')}" alt="${scale} on the RetoScale">`
