@@ -4,25 +4,27 @@
             <v-layout align-center justify-center>
                 <v-flex xs12 sm8 md4>
                     <v-card class="elevation-12 mt-5">
-                        <v-toolbar color="primary">
-                            <v-toolbar-title>Login form</v-toolbar-title>
-                            <v-spacer></v-spacer>
-                        </v-toolbar>
-                        <v-card-text>
-                            <v-form>
+                        <v-form @keyup.native.enter="signIn">
+                            <v-toolbar color="primary">
+                                <v-toolbar-title>Login form</v-toolbar-title>
+                                <v-spacer></v-spacer>
+                            </v-toolbar>
+                            <v-card-text>
                                 <v-text-field prepend-icon="person" name="username" label="Username" type="text"
                                     v-model="user.username" :error-messages="usernameErrors"></v-text-field>
                                 <v-text-field prepend-icon="lock" name="password" label="Password" type="password"
                                     v-model="user.password" :error-messages="passwordErrors"></v-text-field>
-                                <router-link to="/PasswordReset" class="text-xs-right white--text" style="float: right;">Forgot
+                                <router-link to="/PasswordReset" class="text-xs-right white--text"
+                                    style="float: right;">Forgot
                                     Password?</router-link>
-                                <v-checkbox color="primaryAction" v-model="rememberme" label="Remember Login?"></v-checkbox>
-                            </v-form>
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn color="primaryAction" @click="signIn" :disabled=$v.$invalid :loading="loading">Login</v-btn>
-                        </v-card-actions>
+                                <v-checkbox color="primaryAction" v-model="rememberme" label="Remember Login?">
+                                </v-checkbox>
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn @click="signIn" color="primaryAction" :disabled=$v.$invalid :loading="loading">Login</v-btn>
+                            </v-card-actions>
+                        </v-form>
                     </v-card>
                 </v-flex>
             </v-layout>
@@ -32,7 +34,8 @@
                 <v-flex xs12 sm8 md4 offset-sm2 offset-md4>
                     <v-card>
                         <v-card-title class="justify-center">
-                            <h3 class="text-xs-center">Need an account? <router-link to="/register" class="white--text">Register Here</router-link>
+                            <h3 class="text-xs-center">Need an account? <router-link to="/register" class="white--text">
+                                    Register Here</router-link>
                             </h3>
                         </v-card-title>
                     </v-card>
@@ -77,7 +80,7 @@
                     return
                 } else {
                     UserService.signIn(this.user).then(response => {
-                         this.loading = false;
+                        this.loading = false;
                         if (response.data.message) {
                             this.ADD_ERROR(response.data)
                         } else {

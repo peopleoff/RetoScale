@@ -14,10 +14,6 @@
                                     v-model="user.firstname"></v-text-field>
                                 <v-text-field prepend-icon="person" name="lastname" label="Last Name" type="text"
                                     v-model="user.lastname"></v-text-field>
-                                <v-text-field prepend-icon="lock" name="password" label="Password" type="password"
-                                    v-model="user.password"></v-text-field>
-                                <v-text-field prepend-icon="lock" name="confirmPassword" label="Confirm Password"
-                                    type="password" v-model="user.confirmPassword"></v-text-field>
                                 <v-text-field prepend-icon="email" name="email" label="Email" type="email"
                                     v-model="user.email"></v-text-field>
                             </v-form>
@@ -48,11 +44,7 @@
                 user: {
                     firstname: '',
                     lastname: '',
-                    password: '',
-                    confirmPassword: '',
-                    status_id: 3,
                     email: '',
-                    registerKey: ''
                 },
                 loading: false,
             }
@@ -65,7 +57,6 @@
                 'ADD_ERROR'
             ]),
             async getUser() {
-                this.loading = true;
                 let self = this;
                 await UserService.getUser().then(result => {
                     if (result.data.message) {
@@ -74,24 +65,14 @@
                         self.user = result.data;
                     }
                 })
-                this.loading = false;
             },
             async updateUser() {
                 this.loading = true;
                 let self = this;
-                await UserService.updateUser().then(function (result) {
-                    if (result.data.error) {
-                        self.snack = true;
-                        self.snackColor = result.data.type;
-                        self.snackText = result.data.message;
-                    } else {
-                        self.snack = true;
-                        self.snackColor = result.data.type;
-                        self.snackText = result.data.message;
-                    }
-
+                await UserService.updateUser(this.user).then(response => {
+                    this.ADD_ERROR(response.data);
+                    this.loading = false;
                 })
-                this.loading = false;
             }
         },
     }

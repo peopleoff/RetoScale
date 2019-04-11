@@ -21,9 +21,10 @@ export default new Vuex.Store({
       state.user = user;
     },
     ADD_ERROR: (state, error) => {
-      state.error = null;
       state.error = error;
       state.error.show = true;
+      //Clear error
+      setTimeout( () => state.error = null, 3000)
     },
     SIGN_OUT: (state) => {
       state.user = null;

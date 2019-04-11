@@ -51,7 +51,6 @@ module.exports = {
             })
         } catch (err) {
             return res.send({
-                
                 type: 'error',
                 message: err
             })

@@ -34,9 +34,6 @@
                 <v-list-tile to="/profile">
                     Profile
                 </v-list-tile>
-                <v-list-tile to="/users">
-                    All Users
-                </v-list-tile>
                 <v-list-tile to="/logout" color="error">
                     Logout
                 </v-list-tile>

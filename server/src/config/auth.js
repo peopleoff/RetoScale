@@ -8,9 +8,14 @@ const jwtSecret = require('./config').authentication.jwtSecret;
 
 module.exports = {
     isAuthenticated: function (req, res, next) {
-        let token = req.headers.authorization.replace('Bearer ','');
+        //Set empty token to be replaced later
+        let token = null;
 
-        console.log(req.headers);
+        console.log(req.headers.authorization);
+
+        if (req.headers.authorization){
+            token = req.headers.authorization.replace('Bearer ','');
+        }
         //ICheck for null/undefined token in the request
         if (!token) {
             return res.send({

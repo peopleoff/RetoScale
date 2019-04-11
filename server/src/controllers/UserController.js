@@ -254,25 +254,13 @@ module.exports = {
         }
     },
     async updateUser(req, res) {
-        let user = req.body.user;
-        if (user.password) {
-            if (user.password !== user.confirmPassword) {
-                return res.send({
-
-                    message: "Passwords do not match",
-                    type: "error"
-                })
-            } else {
-                user.password = bcrypt.hashSync(user.password, salt);
-            }
-        }
+        let user = req.body;
+        console.log(req.body);
         try {
             await users.update({
                 firstname: user.firstname,
                 lastname: user.lastname,
-                username: user.username,
-                email: user.email,
-                password: user.password
+                email: user.email
             }, {
                 where: {
                     id: user.id
@@ -282,13 +270,13 @@ module.exports = {
                 //0 means no rows were effected and the update failed.
                 if (result == 0) {
                     return res.send({
-
+                        error: true,
                         type: 'error',
                         message: 'Error editing user'
                     })
                 } else {
                     return res.send({
-
+                        error: true,
                         type: 'success',
                         message: 'User Updated'
                     })

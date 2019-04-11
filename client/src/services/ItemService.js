@@ -5,7 +5,6 @@ export default {
     return Api().post('addItem', data)
   },
   updateItem (data) {
-    console.log(data);
     return Api().post('updateItem', data)
   },
   getItems(data){
