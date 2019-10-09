@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/api-retoscale.js"
+    "start": "nodemon src/api-retoscale.js",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "author": "",
   "license": "ISC",
@@ -26,6 +28,8 @@
     "mysql2": "^1.6.4",
     "nodemailer": "^5.0.0",
     "sequelize": "^4.42.0",
-    "winston-loggly-bulk": "^2.0.3"
-  }
+    "winston-loggly-bulk": "^2.0.3",
+    "snyk": "^1.232.0"
+  },
+  "snyk": true
 }
